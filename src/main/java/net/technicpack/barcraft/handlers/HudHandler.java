@@ -4,13 +4,17 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import modwarriors.notenoughkeys.keys.KeyHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.technicpack.barcraft.WorldOfBarcraft;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 public class HudHandler {
@@ -58,6 +62,23 @@ public class HudHandler {
         GL11.glTranslatef(sr.getScaledWidth()/2-212, 16, -90);
         GL11.glScaled(0.9, 0.9, 0.9);
         drawTexturedModalRect(8, -5, 0, 0, 122, 22);
+        GL11.glScaled(0.6, 0.6, 0.6);
+        for (int i = 0; i < 6; i++) {
+            GL11.glTranslatef(33.3f, 0, 0);
+
+            KeyBinding bind = WorldOfBarcraft.proxy.getActionBarBinding(i);
+            boolean[] modifiers = KeyHelper.alternates.get(bind.getKeyDescription());
+            String keyBindText = "";
+            if (modifiers[0])
+                keyBindText += "S";
+            if (modifiers[1])
+                keyBindText += "C";
+            if (modifiers[2])
+                keyBindText += "A";
+            keyBindText += Keyboard.getKeyName(bind.getKeyCode());
+            int width = minecraft.fontRendererObj.getStringWidth(keyBindText);
+            minecraft.fontRendererObj.drawString(keyBindText, 12 - width, 14, 0xFFFFFF);
+        }
         GL11.glPopMatrix();
 
         GL11.glDisable(3042);
