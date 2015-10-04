@@ -1,5 +1,6 @@
 package net.technicpack.barcraft.impl;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
 import net.technicpack.barcraft.api.IBarcraftApi;
@@ -43,5 +44,14 @@ public class BarcraftApi implements IBarcraftApi {
     @Override
     public void registerActionContainer(IActionContainer container) {
         barcraftBars.put(container.getKey(), container);
+    }
+
+    @Override
+    public boolean triggerAction(IAction action, EntityPlayer source) {
+        if (!action.canTrigger(source))
+            return false;
+
+        action.trigger(source);
+        return true;
     }
 }

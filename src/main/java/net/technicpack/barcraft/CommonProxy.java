@@ -1,6 +1,8 @@
 package net.technicpack.barcraft;
 
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.technicpack.barcraft.api.IBarcraftApi;
 import net.technicpack.barcraft.impl.BarcraftApi;
 
@@ -18,4 +20,10 @@ public class CommonProxy {
     }
 
     public void addActions() {}
+
+    public void triggerKeybind(String keyBind) {}
+
+    public EntityPlayer getNetworkPlayer(MessageContext ctx) {
+        return ctx.getServerHandler().playerEntity;
+    }
 }

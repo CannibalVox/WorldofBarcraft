@@ -202,48 +202,6 @@ public class HudHandler {
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glPopMatrix();
 
-//
-//
-//        GL11.glPushMatrix();
-//        //Draw a thing
-//        GL11.glTranslatef(sr.getScaledWidth() / 2 - 212, 16, -90);
-//        GL11.glScaled(0.9, 0.9, 0.9);
-//        drawTexturedModalRect(8, -5, 0, 0, 122, 22);
-//        GL11.glScaled(0.6, 0.6, 0.6);
-//        for (int i = 0; i < 6; i++) {
-//            GL11.glTranslatef(33.3f, 0, 0);
-//
-//            minecraft.getTextureManager().bindTexture(new ResourceLocation("textures/atlas/abilities.png"));
-//            GL11.glDisable(GL11.GL_LIGHTING);
-//            GL11.glEnable(GL11.GL_BLEND);
-//            OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-//            GL11.glEnable(GL11.GL_ALPHA_TEST);
-//
-//            GL11.glPushMatrix();
-//            GL11.glScaled(1.6667, 1.6667, 1.6667);
-//            renderIcon(-9, -2, ActionBarHandler.actionIcons[i], 16, 16);
-//            GL11.glPopMatrix();
-//
-//            KeyBinding bind = WorldOfBarcraft.proxy.getActionBarBinding(i);
-//            boolean[] modifiers = KeyHelper.alternates.get(bind.getKeyDescription());
-//            String keyBindText = "";
-//            if (modifiers[0])
-//                keyBindText += "S";
-//            if (modifiers[1])
-//                keyBindText += "C";
-//            if (modifiers[2])
-//                keyBindText += "A";
-//            keyBindText += Keyboard.getKeyName(bind.getKeyCode());
-//            int width = minecraft.fontRendererObj.getStringWidth(keyBindText);
-//            minecraft.fontRendererObj.drawString(keyBindText, 12 - width, 14, 0);
-//            minecraft.fontRendererObj.drawString(keyBindText, 11 - width, 13, 0xFFFFFF);
-//            GL11.glColor4f(1, 1, 1, 1);
-//        }
-//        GL11.glEnable(GL11.GL_LIGHTING);
-//        GL11.glDisable(GL11.GL_ALPHA_TEST);
-//        GL11.glDisable(GL11.GL_BLEND);
-//        GL11.glPopMatrix();
-
         GL11.glDisable(3042);
 
         GL11.glPopMatrix();

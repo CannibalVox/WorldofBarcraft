@@ -16,6 +16,7 @@ import net.technicpack.barcraft.defaultBar.DefaultActionBar;
 import net.technicpack.barcraft.defaultBar.DummyAction;
 import net.technicpack.barcraft.handlers.ActionBarHandler;
 import net.technicpack.barcraft.handlers.HudHandler;
+import net.technicpack.barcraft.network.BarcraftNetwork;
 
 @Mod(modid = WorldOfBarcraft.MODID, version = WorldOfBarcraft.VERSION)
 public class WorldOfBarcraft {
@@ -53,6 +54,7 @@ public class WorldOfBarcraft {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        BarcraftNetwork.init();
         Minecraft.getMinecraft().renderEngine.loadTextureMap(new ResourceLocation("textures/atlas/abilities.png"), abilityAtlas);
         proxy.addActions();
     }

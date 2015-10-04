@@ -1,9 +1,13 @@
 package net.technicpack.barcraft;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.relauncher.Side;
 import modwarriors.notenoughkeys.api.Api;
 import modwarriors.notenoughkeys.keys.KeyHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
 import net.technicpack.barcraft.api.IBarcraftApi;
@@ -13,10 +17,13 @@ import net.technicpack.barcraft.impl.BarcraftClientApi;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ClientProxy extends CommonProxy {
     private IBarcraftClientApi clientApi;
+    private HashMap<String, Integer> keybindIndices = new HashMap<String, Integer>();
+    private HashMap<String, IActionContainer> keybindContainers = new HashMap<String, IActionContainer>();
 
     public void initApi() {
         this.clientApi = new BarcraftClientApi();
@@ -33,12 +40,30 @@ public class ClientProxy extends CommonProxy {
         for (IActionContainer bar : clientApi.getActionBars()) {
             for (int i = 0; i < bar.getActionCount(); i++) {
                 KeyBinding binding = bar.getKeybindingForAction(i);
-                ClientRegistry.registerKeyBinding(binding);
-                allBindings.add(binding.getKeyDescription());
+
+                if (binding != null) {
+                    ClientRegistry.registerKeyBinding(binding);
+                    allBindings.add(binding.getKeyDescription());
+                    keybindIndices.put(binding.getKeyDescription(), i);
+                    keybindContainers.put(binding.getKeyDescription(), bar);
+                }
             }
         }
 
         Api.registerMod("barcraft",  allBindings.toArray(new String[allBindings.size()]));
+    }
+
+    @Override
+    public void triggerKeybind(String keybindDesc) {
+        if (!keybindIndices.containsKey(keybindDesc) || !keybindContainers.containsKey(keybindDesc))
+            return;
+
+        IAction triggerAction = keybindContainers.get(keybindDesc).getAction(keybindIndices.get(keybindDesc));
+
+        if (triggerAction == null)
+            return;
+
+        getApi().triggerAction(triggerAction, Minecraft.getMinecraft().thePlayer);
     }
 
     @Override
@@ -49,5 +74,13 @@ public class ClientProxy extends CommonProxy {
         clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy4"));
         clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy5"));
         clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy6"));
+    }
+
+    @Override
+    public EntityPlayer getNetworkPlayer(MessageContext ctx) {
+        if (ctx.side == Side.CLIENT)
+            return Minecraft.getMinecraft().thePlayer;
+        else
+            return super.getNetworkPlayer(ctx);
     }
 }

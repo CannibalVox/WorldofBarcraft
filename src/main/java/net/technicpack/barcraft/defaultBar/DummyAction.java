@@ -1,12 +1,13 @@
 package net.technicpack.barcraft.defaultBar;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
 
 public class DummyAction implements IAction {
-
     private String key;
     private String displayName;
     private String iconPath;
@@ -41,4 +42,15 @@ public class DummyAction implements IAction {
 
     @Override
     public IIcon getIcon() { return icon; }
+
+    @Override
+    public boolean canTrigger(EntityPlayer source) {
+        return true;
+    }
+
+    @Override
+    public void trigger(EntityPlayer source) {
+        if (!source.getEntityWorld().isRemote)
+            source.addChatMessage(new ChatComponentText("BUTT"));
+    }
 }

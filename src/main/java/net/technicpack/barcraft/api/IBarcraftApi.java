@@ -16,4 +16,6 @@ public interface IBarcraftApi {
     void registerActionContainer(IActionContainer container);
     IActionContainer getActionContainer(String key);
     Iterable<IActionContainer> getActionBars();
+
+    boolean triggerAction(IAction action, EntityPlayer source);
 }
