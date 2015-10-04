@@ -8,10 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.technicpack.barcraft.WorldOfBarcraft;
+import net.technicpack.barcraft.api.IAction;
+import net.technicpack.barcraft.api.IActionContainer;
 
 public class ActionBarHandler {
-
-    public static IIcon[] actionIcons;
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
@@ -24,13 +24,9 @@ public class ActionBarHandler {
     @SideOnly(Side.CLIENT)
     public void onTextureLoad(TextureStitchEvent.Pre event) {
         if (event.map == WorldOfBarcraft.instance.abilityAtlas) {
-            actionIcons = new IIcon[6];
-            actionIcons[0] = event.map.registerIcon("barcraft:action1");
-            actionIcons[1] = event.map.registerIcon("barcraft:action2");
-            actionIcons[2] = event.map.registerIcon("barcraft:action3");
-            actionIcons[3] = event.map.registerIcon("barcraft:action4");
-            actionIcons[4] = event.map.registerIcon("barcraft:action5");
-            actionIcons[5] = event.map.registerIcon("barcraft:action6");
+            for (IAction action : WorldOfBarcraft.proxy.getApi().getActions()) {
+                action.registerIcons(event.map);
+            }
         }
     }
 }

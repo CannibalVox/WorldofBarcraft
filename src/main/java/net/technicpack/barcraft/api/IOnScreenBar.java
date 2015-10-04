@@ -1,5 +1,6 @@
 package net.technicpack.barcraft.api;
 
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.Rectangle;
 
@@ -23,7 +24,11 @@ public interface IOnScreenBar {
     boolean drawKeyboardData();
 
     ///Where on the screen this bar is for purposes of drawing & collecting clicks
-    Vector3d barScreenPosition();
+    Vector3d barScreenPosition(ScaledResolution scaledResolution);
+    ///How big in pixels the bar is
+    int getPixelWidth();
+    int getPixelHeight();
+
     ///If the user clicks in this bar's rectangle, but not on an action, the mouse position will be passed to this method.
     ///If it returns true, the mouse click will be blocked from passing through to the rest of the UI
     boolean shouldBlockMouseClick(int x, int y);

@@ -16,8 +16,15 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.technicpack.barcraft.WorldOfBarcraft;
+import net.technicpack.barcraft.api.IAction;
+import net.technicpack.barcraft.api.IActionContainer;
+import net.technicpack.barcraft.api.IOnScreenBar;
+import net.technicpack.barcraft.impl.BarcraftClientApi;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.Rectangle;
+
+import javax.vecmath.Vector3d;
 
 public class HudHandler {
 
@@ -41,6 +48,8 @@ public class HudHandler {
         if (entity == null || !(entity instanceof EntityPlayer))
             return;
 
+        BarcraftClientApi api = (BarcraftClientApi)WorldOfBarcraft.proxy.getApi();
+
         EntityPlayer player = (EntityPlayer)entity;
 
         GL11.glPushMatrix();
@@ -57,47 +66,183 @@ public class HudHandler {
         GL11.glEnable(3042);
         GL11.glBlendFunc(770, 771);
 
-        minecraft.getTextureManager().bindTexture(actionBar);
+        for (IActionContainer container : api.getActionBars()) {
+            if (container.getRenderData() == null || !container.getRenderData().appearsOnScreen())
+                continue;
 
+            IOnScreenBar renderData = container.getRenderData();
+
+            minecraft.getTextureManager().bindTexture(renderData.getBarArt());
+            GL11.glPushMatrix();
+            Vector3d position = renderData.barScreenPosition(sr);
+            GL11.glTranslated(position.x, position.y, position.z);
+            double scale = renderData.getOnScreenScale();
+            GL11.glScaled(scale, scale, scale);
+            drawTexturedModalRect(0, 0, 0, 0, renderData.getPixelWidth(), renderData.getPixelHeight());
+            GL11.glPopMatrix();
+        }
+
+        minecraft.getTextureManager().bindTexture(new ResourceLocation("textures/atlas/abilities.png"));
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glPushMatrix();
-        //Draw a thing
-        GL11.glTranslatef(sr.getScaledWidth() / 2 - 212, 16, -90);
-        GL11.glScaled(0.9, 0.9, 0.9);
-        drawTexturedModalRect(8, -5, 0, 0, 122, 22);
-        GL11.glScaled(0.6, 0.6, 0.6);
-        for (int i = 0; i < 6; i++) {
-            GL11.glTranslatef(33.3f, 0, 0);
 
-            minecraft.getTextureManager().bindTexture(new ResourceLocation("textures/atlas/abilities.png"));
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_BLEND);
-            OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-            GL11.glEnable(GL11.GL_ALPHA_TEST);
+        for (IActionContainer container : api.getActionBars()) {
+            if (container.getRenderData() == null || !container.getRenderData().appearsOnScreen())
+                continue;
+
+            IOnScreenBar renderData = container.getRenderData();
+
+            double barSize = renderData.getActionWidth();
+            double targetSize = barSize;
+            Rectangle insets = renderData.barGraphicInsets();
+            double spacing = renderData.getBarSpacing() + barSize;
 
             GL11.glPushMatrix();
-            GL11.glScaled(1.6667, 1.6667, 1.6667);
-            renderIcon(-9, -2, ActionBarHandler.actionIcons[i], 16, 16);
-            GL11.glPopMatrix();
+            Vector3d position = renderData.barScreenPosition(sr);
+            GL11.glTranslated(position.x, position.y, position.z);
+            double scale = renderData.getOnScreenScale();
+            GL11.glScaled(scale, scale, scale);
 
-            KeyBinding bind = WorldOfBarcraft.proxy.getActionBarBinding(i);
-            boolean[] modifiers = KeyHelper.alternates.get(bind.getKeyDescription());
-            String keyBindText = "";
-            if (modifiers[0])
-                keyBindText += "S";
-            if (modifiers[1])
-                keyBindText += "C";
-            if (modifiers[2])
-                keyBindText += "A";
-            keyBindText += Keyboard.getKeyName(bind.getKeyCode());
-            int width = minecraft.fontRendererObj.getStringWidth(keyBindText);
-            minecraft.fontRendererObj.drawString(keyBindText, 12 - width, 14, 0);
-            minecraft.fontRendererObj.drawString(keyBindText, 11 - width, 13, 0xFFFFFF);
-            GL11.glColor4f(1, 1, 1, 1);
+            for (int i = 0; i < container.getActionCount(); i++) {
+                IAction action = container.getAction(i);
+
+                if (action == null)
+                    continue;
+
+                IIcon icon = action.getIcon();
+                double sourceSize = icon.getIconWidth();
+                double iconScale = targetSize / sourceSize;
+                GL11.glPushMatrix();
+                double translateX = insets.getX()*scale;
+                double translateY = insets.getY()*scale;
+                double offset = i*spacing;
+
+                if (renderData.isBarHorizontalOnScreen())
+                    translateX += offset;
+                else
+                    translateY += offset;
+                GL11.glTranslated(translateX, translateY, 0);
+                GL11.glScaled(iconScale, iconScale, iconScale);
+                renderIcon(0, 0, action.getIcon(), action.getIcon().getIconWidth(), action.getIcon().getIconHeight());
+
+                GL11.glPopMatrix();
+            }
+
+
+            GL11.glPopMatrix();
         }
+
+        for (IActionContainer container : api.getActionBars()) {
+            if (container.getRenderData() == null || !container.getRenderData().appearsOnScreen() || !container.getRenderData().drawKeyboardData())
+                continue;
+
+            IOnScreenBar renderData = container.getRenderData();
+
+            double barSize = renderData.getActionWidth();
+            double targetSize = barSize;
+            Rectangle insets = renderData.barGraphicInsets();
+            double spacing = renderData.getBarSpacing() + barSize;
+
+            GL11.glPushMatrix();
+            Vector3d position = renderData.barScreenPosition(sr);
+            GL11.glTranslated(position.x, position.y, position.z);
+            double scale = renderData.getOnScreenScale();
+            GL11.glScaled(scale, scale, scale);
+
+            for (int i = 0; i < container.getActionCount(); i++) {
+                IAction action = container.getAction(i);
+
+                if (action == null)
+                    continue;
+
+                GL11.glPushMatrix();
+                double translateX = insets.getX()*scale;
+                double translateY = insets.getY()*scale;
+                double offset = i*spacing;
+
+                if (renderData.isBarHorizontalOnScreen())
+                    translateX += offset;
+                else
+                    translateY += offset;
+                GL11.glTranslated(translateX, translateY, 0);
+                KeyBinding bind = container.getKeybindingForAction(i);
+
+                if (bind == null)
+                    continue;
+
+                boolean[] modifiers = KeyHelper.alternates.get(bind.getKeyDescription());
+                String keyBindText = "";
+                if (modifiers[0])
+                    keyBindText += "S";
+                if (modifiers[1])
+                    keyBindText += "C";
+                if (modifiers[2])
+                    keyBindText += "A";
+                keyBindText += Keyboard.getKeyName(bind.getKeyCode());
+                int width = minecraft.fontRendererObj.getStringWidth(keyBindText);
+
+                double textScale = targetSize / 22.0;
+                GL11.glScaled(textScale, textScale, textScale);
+
+                minecraft.fontRendererObj.drawString(keyBindText, 21 - width, 13, 0);
+                minecraft.fontRendererObj.drawString(keyBindText, 21 - width - 1, 14, 0xFFFFFF);
+                GL11.glColor4f(1, 1, 1, 1);
+
+                GL11.glPopMatrix();
+            }
+
+            GL11.glPopMatrix();
+        }
+
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glPopMatrix();
+
+//
+//
+//        GL11.glPushMatrix();
+//        //Draw a thing
+//        GL11.glTranslatef(sr.getScaledWidth() / 2 - 212, 16, -90);
+//        GL11.glScaled(0.9, 0.9, 0.9);
+//        drawTexturedModalRect(8, -5, 0, 0, 122, 22);
+//        GL11.glScaled(0.6, 0.6, 0.6);
+//        for (int i = 0; i < 6; i++) {
+//            GL11.glTranslatef(33.3f, 0, 0);
+//
+//            minecraft.getTextureManager().bindTexture(new ResourceLocation("textures/atlas/abilities.png"));
+//            GL11.glDisable(GL11.GL_LIGHTING);
+//            GL11.glEnable(GL11.GL_BLEND);
+//            OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+//            GL11.glEnable(GL11.GL_ALPHA_TEST);
+//
+//            GL11.glPushMatrix();
+//            GL11.glScaled(1.6667, 1.6667, 1.6667);
+//            renderIcon(-9, -2, ActionBarHandler.actionIcons[i], 16, 16);
+//            GL11.glPopMatrix();
+//
+//            KeyBinding bind = WorldOfBarcraft.proxy.getActionBarBinding(i);
+//            boolean[] modifiers = KeyHelper.alternates.get(bind.getKeyDescription());
+//            String keyBindText = "";
+//            if (modifiers[0])
+//                keyBindText += "S";
+//            if (modifiers[1])
+//                keyBindText += "C";
+//            if (modifiers[2])
+//                keyBindText += "A";
+//            keyBindText += Keyboard.getKeyName(bind.getKeyCode());
+//            int width = minecraft.fontRendererObj.getStringWidth(keyBindText);
+//            minecraft.fontRendererObj.drawString(keyBindText, 12 - width, 14, 0);
+//            minecraft.fontRendererObj.drawString(keyBindText, 11 - width, 13, 0xFFFFFF);
+//            GL11.glColor4f(1, 1, 1, 1);
+//        }
+//        GL11.glEnable(GL11.GL_LIGHTING);
+//        GL11.glDisable(GL11.GL_ALPHA_TEST);
+//        GL11.glDisable(GL11.GL_BLEND);
+//        GL11.glPopMatrix();
 
         GL11.glDisable(3042);
 

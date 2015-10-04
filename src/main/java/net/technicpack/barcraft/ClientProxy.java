@@ -4,24 +4,50 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import modwarriors.notenoughkeys.api.Api;
 import modwarriors.notenoughkeys.keys.KeyHelper;
 import net.minecraft.client.settings.KeyBinding;
+import net.technicpack.barcraft.api.IAction;
+import net.technicpack.barcraft.api.IActionContainer;
+import net.technicpack.barcraft.api.IBarcraftApi;
+import net.technicpack.barcraft.api.IBarcraftClientApi;
+import net.technicpack.barcraft.impl.BarcraftApi;
+import net.technicpack.barcraft.impl.BarcraftClientApi;
 import org.lwjgl.input.Keyboard;
 
-public class ClientProxy extends CommonProxy {
+import java.util.ArrayList;
+import java.util.List;
 
-    private KeyBinding[] actionBarBindings = new KeyBinding[6];
+public class ClientProxy extends CommonProxy {
+    private IBarcraftClientApi clientApi;
+
+    public void initApi() {
+        this.clientApi = new BarcraftClientApi();
+    }
+
+    public IBarcraftApi getApi() {
+        return this.clientApi;
+    }
 
     @Override
     public void registerClientKeys() {
-        Api.registerMod("barcraft", "barcraft.action1", "barcraft.action2", "barcraft.action3", "barcraft.action4", "barcraft.action5", "barcraft.action6");
+        List<String> allBindings = new ArrayList<String>();
 
-        for (int i = 0; i < 6; i++) {
-            String keyName = "barcraft.action"+Integer.toString(i+1);
-            actionBarBindings[i] = new KeyBinding(keyName, Keyboard.KEY_1+i, "barcraft");
-            ClientRegistry.registerKeyBinding(actionBarBindings[i]);
+        for (IActionContainer bar : clientApi.getActionBars()) {
+            for (int i = 0; i < bar.getActionCount(); i++) {
+                KeyBinding binding = bar.getKeybindingForAction(i);
+                ClientRegistry.registerKeyBinding(binding);
+                allBindings.add(binding.getKeyDescription());
+            }
         }
+
+        Api.registerMod("barcraft",  allBindings.toArray(new String[allBindings.size()]));
     }
 
-    public KeyBinding getActionBarBinding(int index) {
-        return actionBarBindings[index];
+    @Override
+    public void addActions() {
+        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy1"));
+        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy2"));
+        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy3"));
+        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy4"));
+        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy5"));
+        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy6"));
     }
 }
