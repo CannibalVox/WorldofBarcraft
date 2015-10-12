@@ -13,7 +13,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.technicpack.barcraft.defaultBar.DefaultActionBar;
+import net.technicpack.barcraft.defaultBar.DiamondHelmAction;
 import net.technicpack.barcraft.defaultBar.DummyAction;
+import net.technicpack.barcraft.defaultBar.EquipmentChangeHandler;
 import net.technicpack.barcraft.handlers.ActionBarHandler;
 import net.technicpack.barcraft.handlers.HudHandler;
 import net.technicpack.barcraft.network.BarcraftNetwork;
@@ -41,9 +43,10 @@ public class WorldOfBarcraft {
         proxy.getApi().registerAction(new DummyAction("barcraft:dummy3", "barcraft.action3", "barcraft:action3"));
         proxy.getApi().registerAction(new DummyAction("barcraft:dummy4", "barcraft.action4", "barcraft:action4"));
         proxy.getApi().registerAction(new DummyAction("barcraft:dummy5", "barcraft.action5", "barcraft:action5"));
-        proxy.getApi().registerAction(new DummyAction("barcraft:dummy6", "barcraft.action6", "barcraft:action6"));
+        proxy.getApi().registerAction(new DiamondHelmAction("barcraft:dummy6", "barcraft.action6", "barcraft:action6"));
 
         FMLCommonHandler.instance().bus().register(new HudHandler());
+        FMLCommonHandler.instance().bus().register(new EquipmentChangeHandler());
 
         proxy.registerClientKeys();
         proxy.createTextureAtlas();
@@ -53,6 +56,5 @@ public class WorldOfBarcraft {
     public void init(FMLInitializationEvent event) {
         BarcraftNetwork.init();
         proxy.loadTextureAtlas();
-        proxy.addActions();
     }
 }

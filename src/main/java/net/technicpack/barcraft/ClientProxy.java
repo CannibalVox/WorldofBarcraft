@@ -72,16 +72,6 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void addActions() {
-        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy1"));
-        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy2"));
-        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy3"));
-        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy4"));
-        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy5"));
-        clientApi.appendPlayerAction(clientApi.getAction("barcraft:dummy6"));
-    }
-
-    @Override
     public EntityPlayer getNetworkPlayer(MessageContext ctx) {
         if (ctx.side == Side.CLIENT)
             return Minecraft.getMinecraft().thePlayer;

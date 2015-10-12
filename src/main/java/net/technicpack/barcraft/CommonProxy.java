@@ -25,8 +25,6 @@ public class CommonProxy {
         return this.api;
     }
 
-    public void addActions() {}
-
     public void triggerKeybind(String keyBind) {}
 
     public EntityPlayer getNetworkPlayer(MessageContext ctx) {
