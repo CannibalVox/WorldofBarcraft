@@ -30,8 +30,6 @@ public class WorldOfBarcraft {
     @SidedProxy(clientSide="net.technicpack.barcraft.ClientProxy", serverSide = "net.technicpack.barcraft.CommonProxy")
     public static CommonProxy proxy;
 
-    public TextureMap abilityAtlas;
-
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 
@@ -46,16 +44,15 @@ public class WorldOfBarcraft {
         proxy.getApi().registerAction(new DummyAction("barcraft:dummy6", "barcraft.action6", "barcraft:action6"));
 
         FMLCommonHandler.instance().bus().register(new HudHandler());
-        MinecraftForge.EVENT_BUS.register(new ActionBarHandler());
 
         proxy.registerClientKeys();
-        abilityAtlas = new TextureMap(57, "textures/abilities");
+        proxy.createTextureAtlas();
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         BarcraftNetwork.init();
-        Minecraft.getMinecraft().renderEngine.loadTextureMap(new ResourceLocation("textures/atlas/abilities.png"), abilityAtlas);
+        proxy.loadTextureAtlas();
         proxy.addActions();
     }
 }

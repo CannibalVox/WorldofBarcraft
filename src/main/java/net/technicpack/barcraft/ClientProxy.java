@@ -6,12 +6,16 @@ import cpw.mods.fml.relauncher.Side;
 import modwarriors.notenoughkeys.api.Api;
 import modwarriors.notenoughkeys.keys.KeyHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
 import net.technicpack.barcraft.api.IBarcraftApi;
 import net.technicpack.barcraft.api.IBarcraftClientApi;
+import net.technicpack.barcraft.handlers.ActionBarHandler;
 import net.technicpack.barcraft.impl.BarcraftApi;
 import net.technicpack.barcraft.impl.BarcraftClientApi;
 import org.lwjgl.input.Keyboard;
@@ -24,6 +28,7 @@ public class ClientProxy extends CommonProxy {
     private IBarcraftClientApi clientApi;
     private HashMap<String, Integer> keybindIndices = new HashMap<String, Integer>();
     private HashMap<String, IActionContainer> keybindContainers = new HashMap<String, IActionContainer>();
+    public TextureMap abilityAtlas;
 
     public void initApi() {
         this.clientApi = new BarcraftClientApi();
@@ -82,5 +87,16 @@ public class ClientProxy extends CommonProxy {
             return Minecraft.getMinecraft().thePlayer;
         else
             return super.getNetworkPlayer(ctx);
+    }
+
+    @Override
+    public void createTextureAtlas() {
+        abilityAtlas = new TextureMap(57, "textures/abilities");
+        MinecraftForge.EVENT_BUS.register(new ActionBarHandler(abilityAtlas));
+    }
+
+    @Override
+    public void loadTextureAtlas() {
+        Minecraft.getMinecraft().renderEngine.loadTextureMap(new ResourceLocation("textures/atlas/abilities.png"), abilityAtlas);
     }
 }

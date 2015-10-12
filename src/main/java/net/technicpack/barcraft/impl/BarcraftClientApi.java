@@ -7,12 +7,22 @@ import net.technicpack.barcraft.api.ActionClientState;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
 import net.technicpack.barcraft.api.IBarcraftClientApi;
+import net.technicpack.barcraft.impl.playerdata.PlayerAccessDatabase;
 import net.technicpack.barcraft.network.BarcraftNetwork;
 import net.technicpack.barcraft.network.packets.TriggerActionPacket;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class BarcraftClientApi extends BarcraftApi implements IBarcraftClientApi {
+
+    private List<IAction> actions = new ArrayList<IAction>();
+
+    public BarcraftClientApi() {
+        super(null);
+    }
+
     @Override
     public void appendPlayerAction(IAction action) {
         String key = action.getKey();
@@ -57,5 +67,23 @@ public class BarcraftClientApi extends BarcraftApi implements IBarcraftClientApi
             return true;
         }
         return false;
+    }
+
+
+    @Override
+    public void grantPlayerAction(EntityPlayer player, IAction action) {
+        actions.add(action);
+        appendPlayerAction(action);
+    }
+
+    @Override
+    public void denyPlayerAction(EntityPlayer player, IAction action) {
+        actions.remove(action);
+        removePlayerAction(action);
+    }
+
+    @Override
+    public boolean playerHasAction(EntityPlayer player, IAction action) {
+        return actions.contains(action);
     }
 }

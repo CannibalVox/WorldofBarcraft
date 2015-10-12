@@ -53,4 +53,14 @@ public class DummyAction implements IAction {
         if (!source.getEntityWorld().isRemote)
             source.addChatMessage(new ChatComponentText("BUTT"));
     }
+
+    @Override
+    public String getConditionKey() {
+        return "barcraft.alwaysSucceed";
+    }
+
+    @Override
+    public boolean calculateAccessCondition(EntityPlayer player) {
+        return true;
+    }
 }
