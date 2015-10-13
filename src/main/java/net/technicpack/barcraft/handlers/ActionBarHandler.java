@@ -44,7 +44,7 @@ public class ActionBarHandler {
     @SideOnly(Side.CLIENT)
     public void onTextureLoad(TextureStitchEvent.Pre event) {
         if (event.map == abilityAtlas) {
-            for (IAction action : WorldOfBarcraft.proxy.getApi().getActions()) {
+            for (IAction action : WorldOfBarcraft.proxy.getApi().getActionRegistry().getActions()) {
                 action.registerIcons(event.map);
             }
         }

@@ -17,10 +17,10 @@ public class ActionDiffHandler implements IMessageHandler<ActionDiffPacket, IMes
         for (AccessDiff diff : message.getDiffs()) {
             switch (diff.getType()) {
                 case ADD:
-                    api.grantPlayerAction(player, api.getAction(diff.getAction()));
+                    api.grantPlayerAction(player, api.getActionRegistry().getAction(diff.getAction()));
                     break;
                 case REMOVE:
-                    api.denyPlayerAction(player, api.getAction(diff.getAction()));
+                    api.denyPlayerAction(player, api.getActionRegistry().getAction(diff.getAction()));
                     break;
             }
         }

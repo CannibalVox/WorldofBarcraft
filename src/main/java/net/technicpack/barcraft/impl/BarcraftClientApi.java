@@ -3,10 +3,7 @@ package net.technicpack.barcraft.impl;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.technicpack.barcraft.api.ActionClientState;
-import net.technicpack.barcraft.api.IAction;
-import net.technicpack.barcraft.api.IActionContainer;
-import net.technicpack.barcraft.api.IBarcraftClientApi;
+import net.technicpack.barcraft.api.*;
 import net.technicpack.barcraft.impl.playerdata.PlayerAccessDatabase;
 import net.technicpack.barcraft.network.BarcraftNetwork;
 import net.technicpack.barcraft.network.packets.TriggerActionPacket;
@@ -15,20 +12,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class BarcraftClientApi extends BarcraftApi implements IBarcraftClientApi {
+public class BarcraftClientApi extends BarcraftApi {
 
     private List<IAction> actions = new ArrayList<IAction>();
+    private IActionContainerRegistry actionContainerRegistry;
 
-    public BarcraftClientApi() {
-        super(null);
+    public BarcraftClientApi(IActionRegistry actionRegistry, IActionContainerRegistry actionContainerRegistry) {
+        super(actionRegistry, null);
+        this.actionContainerRegistry = actionContainerRegistry;
     }
 
     @Override
-    public void appendPlayerAction(IAction action) {
+    public IActionContainerRegistry getActionContainerRegistry() { return actionContainerRegistry; }
+
+    private void appendPlayerAction(IAction action) {
         String key = action.getKey();
         IActionContainer containerToUse=null;
         int indexToUse = -1;
-        for (IActionContainer container : getActionBars()) {
+        for (IActionContainer container : getActionContainerRegistry().getActionBars()) {
             boolean canUse = container.canAddAction(action);
             for (int i = 0; i < container.getActionCount(); i++) {
                 IAction currentAction = container.getAction(i);
@@ -45,10 +46,9 @@ public class BarcraftClientApi extends BarcraftApi implements IBarcraftClientApi
             containerToUse.setAction(indexToUse, action);
     }
 
-    @Override
-    public void removePlayerAction(IAction action) {
+    private void removePlayerAction(IAction action) {
         String key = action.getKey();
-        for (IActionContainer container : getActionBars()) {
+        for (IActionContainer container : getActionContainerRegistry().getActionBars()) {
             for (int i = 0; i < container.getActionCount(); i++) {
                 IAction currentAction = container.getAction(i);
 

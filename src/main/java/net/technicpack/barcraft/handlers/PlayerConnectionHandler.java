@@ -21,7 +21,7 @@ public class PlayerConnectionHandler {
     public void playerConnected(PlayerEvent.PlayerLoggedInEvent evt) {
         PlayerAccessDatabase freshPlayer = database.openPlayer(evt.player);
 
-        for (IAction action : WorldOfBarcraft.proxy.getApi().getActions()) {
+        for (IAction action : WorldOfBarcraft.proxy.getApi().getActionRegistry().getActions()) {
             if (action.getConditionKey() != null && !freshPlayer.hasAction(action.getKey())) {
                 if (action.calculateAccessCondition(evt.player))
                     freshPlayer.addConditional(action.getKey());

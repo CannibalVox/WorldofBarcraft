@@ -21,7 +21,7 @@ public class TriggerActionPacket implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         String actionKey = readString(buf);
-        this.action = WorldOfBarcraft.proxy.getApi().getAction(actionKey);
+        this.action = WorldOfBarcraft.proxy.getApi().getActionRegistry().getAction(actionKey);
     }
 
     @Override

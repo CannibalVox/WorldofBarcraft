@@ -18,6 +18,7 @@ import net.technicpack.barcraft.defaultBar.DummyAction;
 import net.technicpack.barcraft.defaultBar.EquipmentChangeHandler;
 import net.technicpack.barcraft.handlers.ActionBarHandler;
 import net.technicpack.barcraft.handlers.HudHandler;
+import net.technicpack.barcraft.impl.ActionRegistry;
 import net.technicpack.barcraft.network.BarcraftNetwork;
 
 @Mod(modid = WorldOfBarcraft.MODID, version = WorldOfBarcraft.VERSION)
@@ -35,15 +36,15 @@ public class WorldOfBarcraft {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 
-        proxy.initApi();
+        proxy.initApi(new ActionRegistry());
+        proxy.registerDefaultBars();
 
-        proxy.getApi().registerActionContainer(new DefaultActionBar());
-        proxy.getApi().registerAction(new DummyAction("barcraft:dummy1", "barcraft.action1", "barcraft:action1"));
-        proxy.getApi().registerAction(new DummyAction("barcraft:dummy2", "barcraft.action2", "barcraft:action2"));
-        proxy.getApi().registerAction(new DummyAction("barcraft:dummy3", "barcraft.action3", "barcraft:action3"));
-        proxy.getApi().registerAction(new DummyAction("barcraft:dummy4", "barcraft.action4", "barcraft:action4"));
-        proxy.getApi().registerAction(new DummyAction("barcraft:dummy5", "barcraft.action5", "barcraft:action5"));
-        proxy.getApi().registerAction(new DiamondHelmAction("barcraft:dummy6", "barcraft.action6", "barcraft:action6"));
+        proxy.getApi().getActionRegistry().registerAction(new DummyAction("barcraft:dummy1", "barcraft.action1", "barcraft:action1"));
+        proxy.getApi().getActionRegistry().registerAction(new DummyAction("barcraft:dummy2", "barcraft.action2", "barcraft:action2"));
+        proxy.getApi().getActionRegistry().registerAction(new DummyAction("barcraft:dummy3", "barcraft.action3", "barcraft:action3"));
+        proxy.getApi().getActionRegistry().registerAction(new DummyAction("barcraft:dummy4", "barcraft.action4", "barcraft:action4"));
+        proxy.getApi().getActionRegistry().registerAction(new DummyAction("barcraft:dummy5", "barcraft.action5", "barcraft:action5"));
+        proxy.getApi().getActionRegistry().registerAction(new DiamondHelmAction("barcraft:dummy6", "barcraft.action6", "barcraft:action6"));
 
         FMLCommonHandler.instance().bus().register(new HudHandler());
         FMLCommonHandler.instance().bus().register(new EquipmentChangeHandler());

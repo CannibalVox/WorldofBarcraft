@@ -66,7 +66,7 @@ public class HudHandler {
         GL11.glEnable(3042);
         GL11.glBlendFunc(770, 771);
 
-        for (IActionContainer container : api.getActionBars()) {
+        for (IActionContainer container : api.getActionContainerRegistry().getActionBars()) {
             if (container.getRenderData() == null || !container.getRenderData().appearsOnScreen())
                 continue;
 
@@ -89,7 +89,7 @@ public class HudHandler {
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glPushMatrix();
 
-        for (IActionContainer container : api.getActionBars()) {
+        for (IActionContainer container : api.getActionContainerRegistry().getActionBars()) {
             if (container.getRenderData() == null || !container.getRenderData().appearsOnScreen())
                 continue;
 
@@ -135,7 +135,7 @@ public class HudHandler {
             GL11.glPopMatrix();
         }
 
-        for (IActionContainer container : api.getActionBars()) {
+        for (IActionContainer container : api.getActionContainerRegistry().getActionBars()) {
             if (container.getRenderData() == null || !container.getRenderData().appearsOnScreen() || !container.getRenderData().drawKeyboardData())
                 continue;
 
