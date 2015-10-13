@@ -66,21 +66,23 @@ public class BarcraftApi implements IBarcraftApi {
         }
     }
 
+    protected BarcraftDatabase getSideDatabase() { return database; }
+
     @Override
     public void grantPlayerAction(EntityPlayer player, IAction action) {
-        PlayerAccessDatabase accessDatabase = database.getPlayer(player);
+        PlayerAccessDatabase accessDatabase = getSideDatabase().getPlayer(player);
         accessDatabase.addUnconditional(action.getKey());
     }
 
     @Override
     public void denyPlayerAction(EntityPlayer player, IAction action) {
-        PlayerAccessDatabase accessDatabase = database.getPlayer(player);
+        PlayerAccessDatabase accessDatabase = getSideDatabase().getPlayer(player);
         accessDatabase.removeUnconditional(action.getKey());
     }
 
     @Override
     public boolean playerHasAction(EntityPlayer player, IAction action) {
-        PlayerAccessDatabase accessDatabase = database.getPlayer(player);
+        PlayerAccessDatabase accessDatabase = getSideDatabase().getPlayer(player);
 
         return accessDatabase.hasAction(action.getKey());
     }

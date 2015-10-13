@@ -1,10 +1,14 @@
 package net.technicpack.barcraft.impl;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.technicpack.barcraft.api.*;
 import net.technicpack.barcraft.impl.playerdata.PlayerAccessDatabase;
+import net.technicpack.barcraft.impl.playerdata.readers.NullReader;
+import net.technicpack.barcraft.impl.playerdata.writers.NullWriter;
 import net.technicpack.barcraft.network.BarcraftNetwork;
 import net.technicpack.barcraft.network.packets.TriggerActionPacket;
 
@@ -13,13 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BarcraftClientApi extends BarcraftApi {
-
-    private List<IAction> actions = new ArrayList<IAction>();
     private IActionContainerRegistry actionContainerRegistry;
 
-    public BarcraftClientApi(IActionRegistry actionRegistry, IActionContainerRegistry actionContainerRegistry) {
-        super(actionRegistry, null);
+    private BarcraftDatabase clientSideDatabase;
+
+    public BarcraftClientApi(IActionRegistry actionRegistry, IActionContainerRegistry actionContainerRegistry, BarcraftDatabase serverDatabase, BarcraftDatabase clientDatabase) {
+        super(actionRegistry, serverDatabase);
         this.actionContainerRegistry = actionContainerRegistry;
+        this.clientSideDatabase = clientDatabase;
     }
 
     @Override
@@ -72,18 +77,24 @@ public class BarcraftClientApi extends BarcraftApi {
 
     @Override
     public void grantPlayerAction(EntityPlayer player, IAction action) {
-        actions.add(action);
+        if (clientSideDatabase.getPlayer(player) == null)
+            clientSideDatabase.addPlayer(player, new PlayerAccessDatabase(player.getUniqueID(), new NullReader(), new NullWriter()));
+        super.grantPlayerAction(player, action);
         appendPlayerAction(action);
     }
 
     @Override
     public void denyPlayerAction(EntityPlayer player, IAction action) {
-        actions.remove(action);
+        if (clientSideDatabase.getPlayer(player) == null)
+            clientSideDatabase.addPlayer(player, new PlayerAccessDatabase(player.getUniqueID(), new NullReader(), new NullWriter()));
+        super.denyPlayerAction(player, action);
         removePlayerAction(action);
     }
 
     @Override
-    public boolean playerHasAction(EntityPlayer player, IAction action) {
-        return actions.contains(action);
+    protected BarcraftDatabase getSideDatabase() {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+            return clientSideDatabase;
+        return super.getSideDatabase();
     }
 }

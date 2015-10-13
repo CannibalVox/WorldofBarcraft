@@ -17,38 +17,32 @@ import net.technicpack.barcraft.api.IActionRegistry;
 import net.technicpack.barcraft.api.IBarcraftApi;
 import net.technicpack.barcraft.defaultBar.DefaultActionBar;
 import net.technicpack.barcraft.handlers.ActionBarHandler;
+import net.technicpack.barcraft.handlers.PlayerClientHandler;
 import net.technicpack.barcraft.impl.ActionContainerRegistry;
 import net.technicpack.barcraft.impl.BarcraftClientApi;
+import net.technicpack.barcraft.impl.BarcraftDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ClientProxy extends CommonProxy {
-    private IBarcraftApi clientApi;
     private HashMap<String, Integer> keybindIndices = new HashMap<String, Integer>();
     private HashMap<String, IActionContainer> keybindContainers = new HashMap<String, IActionContainer>();
     public TextureMap abilityAtlas;
 
     @Override
-    public void initApi(IActionRegistry actionRegistry) {
-        super.initApi(actionRegistry);
-        this.clientApi = new BarcraftClientApi(actionRegistry, new ActionContainerRegistry());
-    }
-
-    @Override
-    public IBarcraftApi getApi() {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-            return this.clientApi;
-        else
-            return super.getApi();
+    protected IBarcraftApi createApi(IActionRegistry actionRegistry, BarcraftDatabase database) {
+        BarcraftDatabase clientDatabase = new BarcraftDatabase();
+        FMLCommonHandler.instance().bus().register(new PlayerClientHandler(clientDatabase));
+        return new BarcraftClientApi(actionRegistry, new ActionContainerRegistry(), database, clientDatabase);
     }
 
     @Override
     public void registerClientKeys() {
         List<String> allBindings = new ArrayList<String>();
 
-        for (IActionContainer bar : clientApi.getActionContainerRegistry().getActionBars()) {
+        for (IActionContainer bar : getApi().getActionContainerRegistry().getActionBars()) {
             for (int i = 0; i < bar.getActionCount(); i++) {
                 KeyBinding binding = bar.getKeybindingForAction(i);
 
@@ -98,6 +92,6 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerDefaultBars() {
-        clientApi.getActionContainerRegistry().registerActionContainer(new DefaultActionBar());
+        getApi().getActionContainerRegistry().registerActionContainer(new DefaultActionBar());
     }
 }

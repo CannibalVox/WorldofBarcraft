@@ -14,17 +14,22 @@ import net.technicpack.barcraft.impl.BarcraftDatabase;
 public class CommonProxy {
     public void registerClientKeys() {}
 
+    private BarcraftDatabase database;
     private IBarcraftApi api;
 
     public void initApi(IActionRegistry actionRegistry) {
-        BarcraftDatabase database = new BarcraftDatabase();
-        this.api = new BarcraftApi(actionRegistry, database);
+        this.database = new BarcraftDatabase();
+        this.api = createApi(actionRegistry, database);
         FMLCommonHandler.instance().bus().register(database);
         FMLCommonHandler.instance().bus().register(new PlayerConnectionHandler(database));
     }
 
     public IBarcraftApi getApi() {
         return this.api;
+    }
+
+    protected IBarcraftApi createApi(IActionRegistry actionRegistry, BarcraftDatabase database) {
+        return new BarcraftApi(actionRegistry, database);
     }
 
     public void triggerKeybind(String keyBind) {}
@@ -38,4 +43,12 @@ public class CommonProxy {
     public void loadTextureAtlas() {}
 
     public void registerDefaultBars() {}
+
+    public void initServerDatabase() {
+        this.database.init();
+    }
+
+    public void shutdownServerDatabase() {
+        this.database.shutdown();
+    }
 }

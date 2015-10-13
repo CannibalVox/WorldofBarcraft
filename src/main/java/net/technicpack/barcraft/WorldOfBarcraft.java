@@ -5,6 +5,9 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.settings.KeyBinding;
@@ -57,5 +60,15 @@ public class WorldOfBarcraft {
     public void init(FMLInitializationEvent event) {
         BarcraftNetwork.init();
         proxy.loadTextureAtlas();
+    }
+
+    @Mod.EventHandler
+    public void serverStartingEvent(FMLServerStartingEvent event) {
+        proxy.initServerDatabase();
+    }
+
+    @Mod.EventHandler
+    public void serverStoppingEvent(FMLServerStoppedEvent event) {
+        proxy.shutdownServerDatabase();
     }
 }

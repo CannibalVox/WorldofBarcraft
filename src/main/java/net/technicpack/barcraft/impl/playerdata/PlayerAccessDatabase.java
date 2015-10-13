@@ -18,74 +18,29 @@ public class PlayerAccessDatabase {
 
     private List<AccessDiff> diffs = new ArrayList<AccessDiff>();
 
-    private static Gson gson = new Gson();
+    private IPlayerWriter writer;
 
-    public PlayerAccessDatabase(UUID uuid) {
+    public PlayerAccessDatabase(UUID uuid, IPlayerReader reader, IPlayerWriter writer) {
         this.playerUUID = uuid;
-        load();
+        this.writer = writer;
+        load(reader);
     }
 
-    private File getPlayerFile() {
-        MinecraftServer server = MinecraftServer.getServer();
-
-        if (server == null)
-            return null;
-
-        return new File(new File(server.getEntityWorld().getSaveHandler().getWorldDirectory(), "worldofbarcraft"), this.playerUUID.toString() + ".json");
-    }
-
-    private void load() {
+    private void load(IPlayerReader reader) {
         for (int i = cachedActions.size()-1; i >= 0; i--) {
             createDiff(DiffType.REMOVE, cachedActions.get(i));
         }
         earnedActions.clear();
         cachedActions.clear();
-        File file = getPlayerFile();
-
-        if (file == null)
-            return;
-
-        if (!file.exists())
-            return;
-
-        try {
-            String data = FileUtils.readFileToString(file);
-            JsonObject obj = gson.fromJson(data, JsonObject.class);
-            if (obj.has("earnedActions")) {
-                JsonArray actions = obj.get("earnedActions").getAsJsonArray();
-                for (JsonElement action : actions) {
-                    if (action.isJsonPrimitive()) {
-                        earnedActions.add(action.getAsString());
-                        cachedActions.add(action.getAsString());
-                        createDiff(DiffType.ADD, action.getAsString());
-                    }
-                }
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        reader.read(playerUUID, earnedActions);
+        for (String action : earnedActions) {
+            cachedActions.add(action);
+            createDiff(DiffType.ADD, action);
         }
     }
 
     public void save() {
-        File file = getPlayerFile();
-
-        if (file == null)
-            return;
-
-        JsonObject obj = new JsonObject();
-        JsonArray actions = new JsonArray();
-        for (String action : earnedActions) {
-            actions.add(new JsonPrimitive(action));
-        }
-        obj.add("earnedActions", actions);
-
-        String data = gson.toJson(obj);
-
-        try {
-            FileUtils.writeStringToFile(file, data);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        writer.write(playerUUID, earnedActions);
     }
 
     public boolean hasAction(String key) {
