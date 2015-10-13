@@ -31,7 +31,7 @@ public class ActionBarHandler {
             String[] keybinds = KeyHelper.compatibleMods.get("barcraft");
             for (int i = 0; i < keybinds.length; i++) {
                 if (keybinds[i].equalsIgnoreCase(pressedKeybind)) {
-                    if (!event.keyBinding.getIsKeyPressed() && event.keyBinding.isPressed()) {
+                    if (event.keyBinding.getIsKeyPressed()) {
                         WorldOfBarcraft.proxy.triggerKeybind(event.keyBinding.getKeyDescription());
                     }
                 }
