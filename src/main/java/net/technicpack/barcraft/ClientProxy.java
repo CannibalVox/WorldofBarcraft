@@ -17,6 +17,7 @@ import net.technicpack.barcraft.api.IActionRegistry;
 import net.technicpack.barcraft.api.IBarcraftApi;
 import net.technicpack.barcraft.defaultBar.DefaultActionBar;
 import net.technicpack.barcraft.handlers.ActionBarHandler;
+import net.technicpack.barcraft.handlers.InventoryModHandler;
 import net.technicpack.barcraft.handlers.PlayerClientHandler;
 import net.technicpack.barcraft.impl.ActionContainerRegistry;
 import net.technicpack.barcraft.impl.BarcraftClientApi;
@@ -35,6 +36,7 @@ public class ClientProxy extends CommonProxy {
     protected IBarcraftApi createApi(IActionRegistry actionRegistry, BarcraftDatabase database) {
         BarcraftDatabase clientDatabase = new BarcraftDatabase();
         FMLCommonHandler.instance().bus().register(new PlayerClientHandler(clientDatabase));
+        MinecraftForge.EVENT_BUS.register(new InventoryModHandler());
         return new BarcraftClientApi(actionRegistry, new ActionContainerRegistry(), database, clientDatabase);
     }
 
