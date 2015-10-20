@@ -3,10 +3,12 @@ package net.technicpack.barcraft.handlers;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.technicpack.barcraft.gui.BarcraftInventoryButton;
+import net.technicpack.barcraft.gui.GuiBarcraftConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -40,7 +42,7 @@ public class InventoryModHandler {
                 guiLeft = 160 + (event.gui.width - xSize - 200) / 2;
             }
 
-            event.buttonList.add(new BarcraftInventoryButton(7391, guiLeft + 149, guiTop + 61, 20, 20, "A"));
+            event.buttonList.add(new BarcraftInventoryButton(7391, guiLeft + 149, guiTop + 6, 20, 20, "A"));
         }
     }
 
@@ -50,6 +52,8 @@ public class InventoryModHandler {
         if (event.gui instanceof GuiInventory) {
             if (event.button.id == 7391) {
                 //Clicked barcraft button
+                GuiInventory inventory = (GuiInventory)event.gui;
+                Minecraft.getMinecraft().displayGuiScreen(new GuiBarcraftConfig());
             }
         }
     }

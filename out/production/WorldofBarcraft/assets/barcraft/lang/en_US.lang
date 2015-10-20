@@ -5,3 +5,5 @@ barcraft.action4=Action 4
 barcraft.action5=Action 5
 barcraft.action6=Action 6
 barcraft=World of Barcraft
+gui.barcraft.actionBar=Barcraft Action Bar
+gui.barcraft.noBars=No Action Bars To Configure

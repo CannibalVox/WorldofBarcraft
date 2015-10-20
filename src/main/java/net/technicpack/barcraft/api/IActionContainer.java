@@ -35,4 +35,5 @@ public interface IActionContainer {
     ///more control over their bars through the default barcraft menu, and also for bars fully managed by their
     ///mods, to prevent barcraft from messing with them.
     boolean isLocked(int index);
+    void setLocked(int index, boolean locked);
 }

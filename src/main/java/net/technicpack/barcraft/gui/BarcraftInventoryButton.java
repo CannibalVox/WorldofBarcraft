@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+import net.technicpack.barcraft.WorldOfBarcraft;
 import org.lwjgl.opengl.GL11;
 
 public class BarcraftInventoryButton extends GuiButton {
@@ -17,6 +18,8 @@ public class BarcraftInventoryButton extends GuiButton {
 
     public BarcraftInventoryButton(int stateName, int id, int p_i1021_3_, int p_i1021_4_, int p_i1021_5_, String p_i1021_6_) {
         super(stateName, id, p_i1021_3_, p_i1021_4_, p_i1021_5_, p_i1021_6_);
+        if (!WorldOfBarcraft.proxy.getApi().getActionContainerRegistry().getActionBars().iterator().hasNext())
+            this.visible = false;
     }
 
     @Override

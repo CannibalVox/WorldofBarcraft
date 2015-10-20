@@ -74,6 +74,11 @@ public class DefaultActionBar implements IActionContainer, IOnScreenBar {
     }
 
     @Override
+    public void setLocked(int index, boolean locked) {
+        locks[index] = locked;
+    }
+
+    @Override
     public boolean appearsOnScreen() {
         return true;
     }
@@ -137,11 +142,6 @@ public class DefaultActionBar implements IActionContainer, IOnScreenBar {
     @Override
     public double getOnScreenScale() {
         return 0.9;
-    }
-
-    @Override
-    public double getInMenuScale() {
-        return 1;
     }
 
     @Override

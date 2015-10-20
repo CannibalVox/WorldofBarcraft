@@ -44,8 +44,6 @@ public interface IOnScreenBar {
 
     //The scale of the action bar when drawn on screen- the above values are all multiplied by this one when drawn.
     double getOnScreenScale();
-    //The scale of the action bar when drawn in the config menu- the above values are all multiplied by this one when drawn
-    double getInMenuScale();
 
     ResourceLocation getBarArt();
 }
