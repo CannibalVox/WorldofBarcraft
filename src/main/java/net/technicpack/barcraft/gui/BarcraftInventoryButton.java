@@ -3,8 +3,10 @@ package net.technicpack.barcraft.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
 import net.technicpack.barcraft.WorldOfBarcraft;
 import org.lwjgl.opengl.GL11;
@@ -12,19 +14,26 @@ import org.lwjgl.opengl.GL11;
 public class BarcraftInventoryButton extends GuiButton {
     private static final ResourceLocation buttonTex = new ResourceLocation("barcraft","textures/gui/inventoryButton.png");
 
-    public BarcraftInventoryButton(int buttonId, int x, int y, String buttonText) {
-        super(buttonId, x, y, buttonText);
-    }
+    private boolean isCreative;
 
-    public BarcraftInventoryButton(int stateName, int id, int p_i1021_3_, int p_i1021_4_, int p_i1021_5_, String p_i1021_6_) {
+    public BarcraftInventoryButton(int stateName, int id, int p_i1021_3_, int p_i1021_4_, int p_i1021_5_, String p_i1021_6_, boolean isCreative) {
         super(stateName, id, p_i1021_3_, p_i1021_4_, p_i1021_5_, p_i1021_6_);
+        this.isCreative = isCreative;
         if (!WorldOfBarcraft.proxy.getApi().getActionContainerRegistry().getActionBars().iterator().hasNext())
             this.visible = false;
     }
 
     @Override
     public void drawButton(Minecraft mc, int xx, int yy) {
-        if (this.visible)
+        boolean doDisplay = this.visible;
+
+        if (this.isCreative) {
+            GuiContainerCreative creative = (GuiContainerCreative)mc.currentScreen;
+            if (creative.func_147056_g() != CreativeTabs.tabInventory.getTabIndex())
+                doDisplay = false;
+        }
+
+        if (this.visible && doDisplay)
         {
             FontRenderer fontrenderer = mc.fontRendererObj;
             mc.getTextureManager().bindTexture(buttonTex);

@@ -4,7 +4,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.technicpack.barcraft.gui.BarcraftInventoryButton;
@@ -42,17 +42,22 @@ public class InventoryModHandler {
                 guiLeft = 160 + (event.gui.width - xSize - 200) / 2;
             }
 
-            event.buttonList.add(new BarcraftInventoryButton(7391, guiLeft + 149, guiTop + 6, 20, 20, "A"));
+            event.buttonList.add(new BarcraftInventoryButton(7391, guiLeft + 149, guiTop + 6, 20, 20, "", false));
+        } else if (event.gui instanceof GuiContainerCreative) {
+            GuiContainerCreative creative = (GuiContainerCreative) event.gui;
+            int guiCenterX = event.gui.width / 2;
+            int guiCenterY = event.gui.height / 2;
+
+            event.buttonList.add(new BarcraftInventoryButton(7391, guiCenterX+72, guiCenterY-62, 20, 20, "", true));
         }
     }
 
     @SideOnly(value = Side.CLIENT)
     @SubscribeEvent
     public void guiPostAction(GuiScreenEvent.ActionPerformedEvent.Post event) {
-        if (event.gui instanceof GuiInventory) {
+        if (event.gui instanceof GuiInventory || event.gui instanceof GuiContainerCreative) {
             if (event.button.id == 7391) {
                 //Clicked barcraft button
-                GuiInventory inventory = (GuiInventory)event.gui;
                 Minecraft.getMinecraft().displayGuiScreen(new GuiBarcraftConfig());
             }
         }
