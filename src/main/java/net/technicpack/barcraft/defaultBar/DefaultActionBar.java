@@ -3,6 +3,7 @@ package net.technicpack.barcraft.defaultBar;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
 import net.technicpack.barcraft.api.ActionClientState;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
@@ -29,7 +30,7 @@ public class DefaultActionBar implements IActionContainer, IOnScreenBar {
 
     @Override
     public String getDisplayName() {
-        return "barcraft.gui.bar.defaultBar";
+        return StatCollector.translateToLocal("gui.barcraft.actionBar");
     }
 
     @Override

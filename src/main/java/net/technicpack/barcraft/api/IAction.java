@@ -8,6 +8,8 @@ public interface IAction {
     String getKey();
     ///This is the unlocalized string used as the ability name
     String getDisplayName();
+    ///This is the unlocalized string used as the ability description
+    String getDescription();
     ///Called during the texture stitching stage to build a separate ability icon atlas.  Abilities should
     ///use this to turn their art into IIcons
     void registerIcons(IIconRegister register);

@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.StatCollector;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
 
@@ -27,8 +28,11 @@ public class DummyAction implements IAction {
 
     @Override
     public String getDisplayName() {
-        return displayName;
+        return StatCollector.translateToLocal(displayName);
     }
+
+    @Override
+    public String getDescription() { return StatCollector.translateToLocal(displayName + ".desc"); }
 
     @Override
     public void registerIcons(IIconRegister register) {
