@@ -205,8 +205,6 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         short short2 = 240;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) short1 / 1.0F, (float) short2 / 1.0F);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        int k1;
-
         GL11.glDisable(GL11.GL_LIGHTING);
     }
 
