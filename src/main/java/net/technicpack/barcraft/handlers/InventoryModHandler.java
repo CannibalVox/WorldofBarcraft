@@ -8,7 +8,10 @@ import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.technicpack.barcraft.gui.BarcraftInventoryButton;
-import net.technicpack.barcraft.gui.GuiBarcraftConfig;
+import net.technicpack.barcraft.gui.config.ControllerBarcraftConfig;
+import net.technicpack.barcraft.gui.config.ModelBarcraftConfig;
+import net.technicpack.barcraft.gui.config.ViewBarcraftConfig;
+import net.technicpack.barcraft.gui.mvc.MVCGui;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -58,7 +61,7 @@ public class InventoryModHandler {
         if (event.gui instanceof GuiInventory || event.gui instanceof GuiContainerCreative) {
             if (event.button.id == 7391) {
                 //Clicked barcraft button
-                Minecraft.getMinecraft().displayGuiScreen(new GuiBarcraftConfig());
+                Minecraft.getMinecraft().displayGuiScreen(new MVCGui<ModelBarcraftConfig, ViewBarcraftConfig>(new ViewBarcraftConfig(), new ModelBarcraftConfig(), new ControllerBarcraftConfig()));
             }
         }
     }
