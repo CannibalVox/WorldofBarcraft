@@ -13,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.technicpack.barcraft.WorldOfBarcraft;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
+import net.technicpack.barcraft.gui.TextWriter;
 import net.technicpack.barcraft.gui.mvc.IGuiView;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -22,15 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
-    private static final int LEADING = 0;
-    private static final int CENTER = 1;
-    private static final int TAILING = 2;
 
     private static final ResourceLocation backgroundTex = new ResourceLocation("barcraft", "textures/gui/actionConfigGui.png");
 
     private ModelBarcraftConfig model;
     private List buttonList;
-    private FontRenderer fontRenderer;
+    private TextWriter textWriter;
     private int zLevel = 0;
 
     private GuiButton actionsPageLeft = null;
@@ -44,7 +42,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
     @Override
     public void initView(List buttonList, FontRenderer fontRenderer) {
         this.buttonList = buttonList;
-        this.fontRenderer = fontRenderer;
+        this.textWriter = new TextWriter(fontRenderer);
         actionsPageLeft = null;
         actionsPageRight = null;
         updateGuiStats();
@@ -55,7 +53,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             int biggestTitleWidth = 0;
             for (IActionContainer bar : model) {
                 String title = bar.getDisplayName();
-                int titleWidth = this.fontRenderer.getStringWidth(title);
+                int titleWidth = this.textWriter.getStringWidth(title);
                 if (titleWidth > biggestTitleWidth)
                     biggestTitleWidth = titleWidth;
             }
@@ -226,11 +224,9 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         Minecraft minecraft = Minecraft.getMinecraft();
         ScaledResolution sr = new ScaledResolution(minecraft, minecraft.displayWidth, minecraft.displayHeight);
         String title = I18n.format("gui.barcraft.noBars", new Object[0]);
-        double titleWidth = this.fontRenderer.getStringWidth(title);
-        double titleHeight = this.fontRenderer.FONT_HEIGHT;
         GL11.glPushMatrix();
         GL11.glScaled(2, 2, 2);
-        this.fontRenderer.drawString(title, (int) ((sr.getScaledWidth_double() - titleWidth) / 8), (int) ((sr.getScaledHeight_double() - titleHeight) / 4), 4210752);
+        this.textWriter.drawStaticText(sr.getScaledWidth_double()/4, sr.getScaledHeight_double()/4, title, TextWriter.CENTER, TextWriter.CENTER);
         GL11.glPopMatrix();
     }
 
@@ -238,12 +234,11 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
     private void drawGui() {
         //
         String title = model.getCurrentBar().getDisplayName();
-        double titleWidth = this.fontRenderer.getStringWidth(title);
         GL11.glPushMatrix();
         GL11.glTranslated(model.getGuiStats().getGuiX() + (model.getGuiStats().getGuiWidth()/2), model.getGuiStats().getGuiY() + (model.getGuiStats().getGuiHeight() * 0.07), 0);
         double titleScale = 3 / model.getGuiStats().getGuiScale();
         GL11.glScaled(titleScale, titleScale, titleScale);
-        this.fontRenderer.drawString(title,1-fontRenderer.getStringWidth(title)/2, 1-fontRenderer.FONT_HEIGHT/2, 4210752);
+        this.textWriter.drawStaticText(1, 1, title, TextWriter.CENTER, TextWriter.CENTER);
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
 
@@ -257,7 +252,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             String abilityName = action.getDisplayName();
             double abilityTextX = model.getGuiStats().getAbilityAreaX() + abilityColumn * model.getGuiStats().getScaledActionSlotSize() + model.getGuiStats().getActionAreaGutterWidth() + (model.getGuiStats().getScaledActionSlotSize() - model.getGuiStats().getScaledTextAreaWidth()) / 2;
             double abilityTextY = model.getGuiStats().getAbilityAreaY() + abilityRow * model.getGuiStats().getScaledActionSlotSize() + model.getGuiStats().getScaledActionTopGutter() + model.getGuiStats().getActionAreaGutterHeight() + model.getGuiStats().getScaledActionSlotSize() - model.getGuiStats().getScaledActionBottomGutter();
-            drawScaledText(abilityTextX, abilityTextY, model.getGuiStats().getScaledTextAreaWidth(), model.getGuiStats().getScaledTextAreaHeight(), abilityName);
+            textWriter.drawScaledText(abilityTextX, abilityTextY, model.getGuiStats().getScaledTextAreaWidth(), model.getGuiStats().getScaledTextAreaHeight(), abilityName);
         }
 
         if (model.getCurrentAction() != null) {
@@ -267,13 +262,13 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             double texty = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
             double textWidth = model.getGuiStats().getInfoAreaWidth() - (model.getGuiStats().getInfoAreaGutterWidth() * 3) - model.getGuiStats().getScaledActionSize();
             double textHeight = model.getGuiStats().getScaledActionSize() * 0.7;
-            drawScaledText(textx, texty, textWidth, textHeight, action.getDisplayName());
+            textWriter.drawScaledText(textx, texty, textWidth, textHeight, action.getDisplayName());
 
             double descx = model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaGutterWidth();
             double descy = model.getGuiStats().getInfoAreaY() + (model.getGuiStats().getInfoAreaGutterHeight() * 2) + (model.getGuiStats().getScaledActionSize() * 1.2);
             double descWidth = model.getGuiStats().getInfoAreaWidth() - (model.getGuiStats().getInfoAreaGutterWidth() * 2);
             double descHeight = model.getGuiStats().getInfoAreaHeight() - (model.getGuiStats().getInfoAreaGutterHeight() * 3) - (model.getGuiStats().getScaledActionSize() * 1.2);
-            drawScaledText(descx, descy, descWidth, descHeight, action.getDescription(), LEADING, LEADING);
+            textWriter.drawScaledText(descx, descy, descWidth, descHeight, action.getDescription(), TextWriter.LEADING, TextWriter.LEADING);
         }
 
         Tessellator tessellator = Tessellator.instance;
@@ -343,99 +338,6 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         tessellator.addVertexWithUV(x + width, y + height, (double) this.zLevel, maxU / texWidth, maxV / texHeight);
         tessellator.addVertexWithUV(x + width, y, (double) this.zLevel, maxU / texWidth, v / texHeight);
         tessellator.addVertexWithUV(x, y, (double) this.zLevel, u / texWidth, v / texHeight);
-    }
-
-    private void drawScaledText(double x, double y, double width, double height, String text) {
-        drawScaledText(x, y, width, height, text, CENTER, CENTER);
-    }
-
-    private void drawScaledText(double x, double y, double width, double height, String text, int hAlignment, int vAlignment) {
-        String[] tokens = text.split("((?<=\\s)|(?=\\s))");
-
-        int largestToken = 0;
-        for (String token : tokens) {
-            int tokenSize = this.fontRenderer.getStringWidth(token);
-            if (tokenSize > largestToken)
-                largestToken = tokenSize;
-        }
-
-        double textWidth = this.fontRenderer.getStringWidth(text);
-        double minScale = Math.min(width / textWidth, height / (double)this.fontRenderer.FONT_HEIGHT);
-
-        int maxLines = (int) (height / ((double) this.fontRenderer.FONT_HEIGHT * minScale));
-
-        Object[] bestText = new String[]{text};
-        double bestScale = minScale;
-        int bestLines = 1;
-
-        if (maxLines > 1) {
-            for (int lineCount = 2; lineCount <= maxLines; lineCount++) {
-                List<String> textLines = new ArrayList<String>(lineCount);
-                double maxSingleWidth = 0;
-                double targetWidth = Math.max(largestToken, textWidth / lineCount);
-                int tokenIndex = 0;
-                for (int i = 0; i < lineCount; i++) {
-                    double currentWidth = 0;
-                    String lineText = "";
-                    boolean beginningOfLine = true;
-
-                    while (tokenIndex < tokens.length && currentWidth < targetWidth) {
-                        String thisToken = tokens[tokenIndex++];
-                        if (beginningOfLine && thisToken.trim().equals(""))
-                            continue;
-                        beginningOfLine = false;
-
-                        int tokenWidth = this.fontRenderer.getStringWidth(thisToken);
-                        if (thisToken.trim().equals("") && currentWidth + tokenWidth >= targetWidth) {
-                            currentWidth += tokenWidth;
-                            continue;
-                        }
-
-                        lineText = lineText.concat(thisToken);
-                        currentWidth += tokenWidth;
-                    }
-
-                    if (maxSingleWidth < currentWidth)
-                        maxSingleWidth = currentWidth;
-                    if (lineText != null && !lineText.trim().equals(""))
-                        textLines.add(lineText);
-                }
-                double horizontalScale = width / maxSingleWidth;
-                double verticalScale = height / (textLines.size() * this.fontRenderer.FONT_HEIGHT);
-                double currentScale = Math.min(horizontalScale, verticalScale);
-                if (currentScale > bestScale) {
-                    bestScale = currentScale;
-                    bestLines = textLines.size();
-                    bestText = textLines.toArray();
-                }
-            }
-        }
-
-        double totalTextHeight = bestLines * this.fontRenderer.FONT_HEIGHT * bestScale;
-
-        GL11.glPushMatrix();
-        double xTranslate = x;
-        double yTranslate = y;
-        if (hAlignment == CENTER)
-            xTranslate += width / 2;
-        else if (hAlignment == TAILING)
-            xTranslate += width;
-        if (vAlignment == CENTER)
-            yTranslate += (height - totalTextHeight) / 2;
-        else if (vAlignment == TAILING)
-            yTranslate += (height - totalTextHeight);
-        GL11.glTranslated(xTranslate, yTranslate, 0);
-        GL11.glScaled(bestScale, bestScale, bestScale);
-        for (int i = 0; i < bestLines; i++) {
-            int lineX = 0;
-            if (hAlignment == CENTER)
-                lineX = (int) -(double) this.fontRenderer.getStringWidth(bestText[i].toString()) / 2;
-            else if (hAlignment == TAILING)
-                lineX = (int) - (double) this.fontRenderer.getStringWidth(bestText[i].toString());
-
-            this.fontRenderer.drawString(bestText[i].toString(), lineX, i * this.fontRenderer.FONT_HEIGHT, 4210752);
-        }
-        GL11.glPopMatrix();
     }
 
     //Render a gray-bordered box in the content of the GUI
