@@ -35,6 +35,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
     private GuiButton actionsPageLeft = null;
     private GuiButton actionsPageRight = null;
 
+    private NineSquareRenderer backing = new NineSquareRenderer(0, 0, 19, 17, 4, 4, 4, 4, 36, 32);
     private NineSquareRenderer grayBox = new NineSquareRenderer(0, 17, 12, 11, 4, 4, 4, 4, 36, 32);
 
     @Override
@@ -125,17 +126,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         tessellator.startDrawingQuads();
 
         //Draw the outside
-        drawImage(tessellator, model.getGuiStats().getGuiX(), model.getGuiStats().getGuiY(), 5, 5, 0, 0, 5, 5, 36, 32);
-        drawImage(tessellator, model.getGuiStats().getGuiX() + 5, model.getGuiStats().getGuiY(), model.getGuiStats().getGuiWidth() - 9, 5, 5, 0, 15, 5, 36, 32);
-        drawImage(tessellator, model.getGuiStats().getGuiX() + (model.getGuiStats().getGuiWidth() - 4), model.getGuiStats().getGuiY(), 4, 5, 15, 0, 20, 5, 36, 32);
-
-        drawImage(tessellator, model.getGuiStats().getGuiX(), model.getGuiStats().getGuiY() + 5, 5, model.getGuiStats().getGuiHeight() - 10, 0, 5, 5, 12, 36, 32);
-        drawImage(tessellator, model.getGuiStats().getGuiX() + 5, model.getGuiStats().getGuiY() + 5, model.getGuiStats().getGuiWidth() - 9, model.getGuiStats().getGuiHeight() - 10, 5, 5, 15, 12, 36, 32);
-        drawImage(tessellator, model.getGuiStats().getGuiX() + (model.getGuiStats().getGuiWidth() - 4), model.getGuiStats().getGuiY() + 5, 4, model.getGuiStats().getGuiHeight() - 10, 15, 5, 20, 12, 36, 32);
-
-        drawImage(tessellator, model.getGuiStats().getGuiX(), model.getGuiStats().getGuiY() + (model.getGuiStats().getGuiHeight() - 5), 5, 5, 0, 12, 5, 17, 36, 32);
-        drawImage(tessellator, model.getGuiStats().getGuiX() + 5, model.getGuiStats().getGuiY() + (model.getGuiStats().getGuiHeight() - 5), model.getGuiStats().getGuiWidth() - 9, 5, 5, 12, 15, 17, 36, 32);
-        drawImage(tessellator, model.getGuiStats().getGuiX() + (model.getGuiStats().getGuiWidth() - 4), model.getGuiStats().getGuiY() + (model.getGuiStats().getGuiHeight() - 5), 4, 5, 15, 12, 20, 17, 36, 32);
+        backing.draw(tessellator, model.getGuiStats().getGuiX(), model.getGuiStats().getGuiY(), this.zLevel, model.getGuiStats().getGuiWidth(), model.getGuiStats().getGuiHeight());
 
         //Only draw the background & some crappy text if we somehow got here without a valid action bar
         if (model.getCurrentBar() == null)
