@@ -13,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.technicpack.barcraft.WorldOfBarcraft;
 import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.api.IActionContainer;
+import net.technicpack.barcraft.gui.NineSquareRenderer;
 import net.technicpack.barcraft.gui.TextWriter;
 import net.technicpack.barcraft.gui.mvc.IGuiView;
 import org.lwjgl.opengl.GL11;
@@ -33,6 +34,8 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
 
     private GuiButton actionsPageLeft = null;
     private GuiButton actionsPageRight = null;
+
+    private NineSquareRenderer grayBox = new NineSquareRenderer(0, 17, 12, 11, 4, 4, 4, 4, 36, 32);
 
     @Override
     public void setModel(ModelBarcraftConfig modelBarcraftConfig) {
@@ -138,9 +141,9 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         if (model.getCurrentBar() == null)
             return;
 
-        drawBox(tessellator, model.getGuiStats().getBarAreaX(), model.getGuiStats().getBarAreaY(), model.getGuiStats().getBarAreaWidth(), model.getGuiStats().getBarAreaHeight());
-        drawBox(tessellator, model.getGuiStats().getAbilityAreaX(), model.getGuiStats().getAbilityAreaY(), model.getGuiStats().getAbilityAreaWidth(), model.getGuiStats().getAbilityAreaHeight());
-        drawBox(tessellator, model.getGuiStats().getInfoAreaX(), model.getGuiStats().getInfoAreaY(), model.getGuiStats().getInfoAreaWidth(), model.getGuiStats().getInfoAreaHeight());
+        grayBox.draw(tessellator, model.getGuiStats().getBarAreaX(), model.getGuiStats().getBarAreaY(), this.zLevel, model.getGuiStats().getBarAreaWidth(), model.getGuiStats().getBarAreaHeight());
+        grayBox.draw(tessellator, model.getGuiStats().getAbilityAreaX(), model.getGuiStats().getAbilityAreaY(),this.zLevel, model.getGuiStats().getAbilityAreaWidth(), model.getGuiStats().getAbilityAreaHeight());
+        grayBox.draw(tessellator, model.getGuiStats().getInfoAreaX(), model.getGuiStats().getInfoAreaY(),this.zLevel, model.getGuiStats().getInfoAreaWidth(), model.getGuiStats().getInfoAreaHeight());
 
         double spacing = model.getCurrentBar().getRenderData().getBarSpacing() + model.getCurrentBar().getRenderData().getActionWidth();
         double lockX = model.getGuiStats().getActionLockX();
@@ -336,20 +339,5 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         tessellator.addVertexWithUV(x + width, y + height, (double) this.zLevel, maxU / texWidth, maxV / texHeight);
         tessellator.addVertexWithUV(x + width, y, (double) this.zLevel, maxU / texWidth, v / texHeight);
         tessellator.addVertexWithUV(x, y, (double) this.zLevel, u / texWidth, v / texHeight);
-    }
-
-    //Render a gray-bordered box in the content of the GUI
-    private void drawBox(Tessellator tessellator, double x, double y, double width, double height) {
-        drawImage(tessellator, x, y, 4, 4, 0, 17, 4, 21, 36, 32);
-        drawImage(tessellator, x + 4, y, width - 8, 4, 4, 17, 8, 21, 36, 32);
-        drawImage(tessellator, x + width - 4, y, 4, 4, 8, 17, 12, 21, 36, 32);
-
-        drawImage(tessellator, x, y + 4, 4, height - 8, 0, 21, 4, 24, 36, 32);
-        drawImage(tessellator, x + 4, y + 4, width - 8, height - 8, 4, 21, 8, 24, 36, 32);
-        drawImage(tessellator, x + width - 4, y + 4, 4, height - 8, 8, 21, 12, 24, 36, 32);
-
-        drawImage(tessellator, x, y + height - 4, 4, 4, 0, 24, 4, 28, 36, 32);
-        drawImage(tessellator, x + 4, y + height - 4, width - 8, 4, 4, 24, 8, 28, 36, 32);
-        drawImage(tessellator, x + width - 4, y + height - 4, 4, 4, 8, 24, 12, 28, 36, 32);
     }
 }
