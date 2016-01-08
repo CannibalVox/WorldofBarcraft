@@ -19,8 +19,6 @@ import net.technicpack.barcraft.gui.mvc.IGuiView;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
@@ -37,6 +35,8 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
 
     private NineSquareRenderer backing = new NineSquareRenderer(0, 0, 19, 17, 4, 4, 4, 4, 36, 32);
     private NineSquareRenderer grayBox = new NineSquareRenderer(0, 17, 12, 11, 4, 4, 4, 4, 36, 32);
+    private NineSquareRenderer scrollTrack = new NineSquareRenderer(12, 17, 6, 6, 2, 2, 2, 2, 36, 32);
+    private NineSquareRenderer scrollThumb = new NineSquareRenderer(12, 23, 6, 5, 1, 1, 1, 1, 36, 32);
 
     @Override
     public void setModel(ModelBarcraftConfig modelBarcraftConfig) {
@@ -94,12 +94,12 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             this.buttonList.remove(actionsPageRight);
 
         if (model.getCurrentBar() != null) {
-            int leftButtonX = (int)model.getGuiStats().getAbilityAreaX() + 6;
-            int buttonY = (int)(model.getGuiStats().getAbilityAreaY() + (model.getGuiStats().getAbilityAreaHeight()/2) - 10);
+            int leftButtonX = (int) model.getGuiStats().getAbilityAreaX() + 6;
+            int buttonY = (int) (model.getGuiStats().getAbilityAreaY() + (model.getGuiStats().getAbilityAreaHeight() / 2) - 10);
             this.actionsPageLeft = new GuiButton(2, leftButtonX, buttonY, 16, 20, "<");
             this.buttonList.add(this.actionsPageLeft);
 
-            int rightButtonX = (int)(model.getGuiStats().getAbilityAreaX() + model.getGuiStats().getAbilityAreaWidth() - (22 / model.getGuiStats().getGuiScale()));
+            int rightButtonX = (int) (model.getGuiStats().getAbilityAreaX() + model.getGuiStats().getAbilityAreaWidth() - (22 / model.getGuiStats().getGuiScale()));
             this.actionsPageRight = new GuiButton(3, rightButtonX, buttonY, 16, 20, ">");
             this.buttonList.add(this.actionsPageRight);
         }
@@ -117,7 +117,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
     // - the area boxes (action bar, action list, info)
     // - the action bar graphic & lock icons
     @Override
-    public void drawBackground( int mouseX, int mouseY, float partialTicks) {
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
 
         //Start drawing background
@@ -133,8 +133,8 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             return;
 
         grayBox.draw(tessellator, model.getGuiStats().getBarAreaX(), model.getGuiStats().getBarAreaY(), this.zLevel, model.getGuiStats().getBarAreaWidth(), model.getGuiStats().getBarAreaHeight());
-        grayBox.draw(tessellator, model.getGuiStats().getAbilityAreaX(), model.getGuiStats().getAbilityAreaY(),this.zLevel, model.getGuiStats().getAbilityAreaWidth(), model.getGuiStats().getAbilityAreaHeight());
-        grayBox.draw(tessellator, model.getGuiStats().getInfoAreaX(), model.getGuiStats().getInfoAreaY(),this.zLevel, model.getGuiStats().getInfoAreaWidth(), model.getGuiStats().getInfoAreaHeight());
+        grayBox.draw(tessellator, model.getGuiStats().getAbilityAreaX(), model.getGuiStats().getAbilityAreaY(), this.zLevel, model.getGuiStats().getAbilityAreaWidth(), model.getGuiStats().getAbilityAreaHeight());
+        grayBox.draw(tessellator, model.getGuiStats().getInfoAreaX(), model.getGuiStats().getInfoAreaY(), this.zLevel, model.getGuiStats().getInfoAreaWidth(), model.getGuiStats().getInfoAreaHeight());
 
         double spacing = model.getCurrentBar().getRenderData().getBarSpacing() + model.getCurrentBar().getRenderData().getActionWidth();
         double lockX = model.getGuiStats().getActionLockX();
@@ -165,10 +165,6 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
                 drawImage(tessellator, actionX, actionY + model.getGuiStats().getScaledActionSlotSize() - thickness, model.getGuiStats().getScaledActionSlotSize(), thickness, 0, 31, 1, 32, 36, 32);
                 drawImage(tessellator, actionX + model.getGuiStats().getScaledActionSlotSize() - thickness, actionY + thickness, thickness, model.getGuiStats().getScaledActionSlotSize() - (2 * thickness), 0, 31, 1, 32, 36, 32);
             }
-
-            double descriptionSplitX = model.getGuiStats().getInfoAreaX() + 3;
-            double descriptionSplitY = model.getGuiStats().getInfoAreaY() + (model.getGuiStats().getInfoAreaGutterHeight() * 1.5) + (model.getGuiStats().getScaledActionSize() * 1.2);
-            drawImage(tessellator, descriptionSplitX, descriptionSplitY, model.getGuiStats().getInfoAreaWidth() - 6, 1, 0, 31, 1, 32, 36, 32);
         }
 
         tessellator.draw();
@@ -218,7 +214,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         String title = I18n.format("gui.barcraft.noBars", new Object[0]);
         GL11.glPushMatrix();
         GL11.glScaled(2, 2, 2);
-        this.textWriter.drawStaticText(sr.getScaledWidth_double()/4, sr.getScaledHeight_double()/4, title, TextWriter.CENTER, TextWriter.CENTER);
+        this.textWriter.drawStaticText(sr.getScaledWidth_double() / 4, sr.getScaledHeight_double() / 4, title, TextWriter.CENTER, TextWriter.CENTER);
         GL11.glPopMatrix();
     }
 
@@ -227,7 +223,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         //
         String title = model.getCurrentBar().getDisplayName();
         GL11.glPushMatrix();
-        GL11.glTranslated(model.getGuiStats().getGuiX() + (model.getGuiStats().getGuiWidth()/2), model.getGuiStats().getGuiY() + (model.getGuiStats().getGuiHeight() * 0.07), 0);
+        GL11.glTranslated(model.getGuiStats().getGuiX() + (model.getGuiStats().getGuiWidth() / 2), model.getGuiStats().getGuiY() + (model.getGuiStats().getGuiHeight() * 0.07), 0);
         double titleScale = 3 / model.getGuiStats().getGuiScale();
         GL11.glScaled(titleScale, titleScale, titleScale);
         this.textWriter.drawStaticText(1, 1, title, TextWriter.CENTER, TextWriter.CENTER);
@@ -247,23 +243,9 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             textWriter.drawScaledText(abilityTextX, abilityTextY, model.getGuiStats().getScaledTextAreaWidth(), model.getGuiStats().getScaledTextAreaHeight(), abilityName);
         }
 
-        if (model.getCurrentAction() != null) {
-            IAction action = model.getCurrentAction();
-
-            double textx = model.getGuiStats().getInfoAreaX() + (model.getGuiStats().getInfoAreaGutterWidth() * 2) + model.getGuiStats().getScaledActionSize();
-            double texty = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
-            double textWidth = model.getGuiStats().getInfoAreaWidth() - (model.getGuiStats().getInfoAreaGutterWidth() * 3) - model.getGuiStats().getScaledActionSize();
-            double textHeight = model.getGuiStats().getScaledActionSize() * 0.7;
-            textWriter.drawScaledText(textx, texty, textWidth, textHeight, action.getDisplayName());
-
-            double descx = model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaGutterWidth();
-            double descy = model.getGuiStats().getInfoAreaY() + (model.getGuiStats().getInfoAreaGutterHeight() * 2) + (model.getGuiStats().getScaledActionSize() * 1.2);
-            double descWidth = model.getGuiStats().getInfoAreaWidth() - (model.getGuiStats().getInfoAreaGutterWidth() * 2);
-            double descHeight = model.getGuiStats().getInfoAreaHeight() - (model.getGuiStats().getInfoAreaGutterHeight() * 3) - (model.getGuiStats().getScaledActionSize() * 1.2);
-            textWriter.drawScaledText(descx, descy, descWidth, descHeight, action.getDescription(), TextWriter.LEADING, TextWriter.LEADING);
-        }
-
         Tessellator tessellator = Tessellator.instance;
+        drawInfoBox(tessellator);
+
         tessellator.startDrawingQuads();
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/atlas/abilities.png"));
@@ -298,15 +280,71 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             drawImage(tessellator, abilityIconX, abilityIconY, model.getGuiStats().getScaledActionSize(), model.getGuiStats().getScaledActionSize(), icon.getMinU(), icon.getMinV(), icon.getMaxU(), icon.getMaxV(), 1, 1);
         }
 
+        tessellator.draw();
+    }
+
+    private void drawInfoBox(Tessellator tessellator) {
         if (model.getCurrentAction() != null) {
             IAction action = model.getCurrentAction();
+
+            double descWidth = model.getGuiStats().getInfoAreaWidth() - (model.getGuiStats().getInfoAreaGutterWidth() * 2);
+            double descHeight = model.getGuiStats().getInfoAreaHeight() - (model.getGuiStats().getInfoAreaGutterHeight() * 3) - (model.getGuiStats().getScaledActionSize() * 1.2);
+            TextWriter.TextFitData textFitData = textWriter.getFitForText(descWidth, descHeight, action.getDescription());
+
+            boolean useScrollbar = textFitData.getScale() <= 1.0;
+            double scrollWidth = model.getGuiStats().getGuiScale() * 4;
+            double scrollArea = model.getGuiStats().getInfoAreaGutterWidth() + scrollWidth;
+
+            double textx = model.getGuiStats().getInfoAreaX() + (model.getGuiStats().getInfoAreaGutterWidth() * 2) + model.getGuiStats().getScaledActionSize();
+            double texty = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
+            double textWidth = model.getGuiStats().getInfoAreaWidth() - (model.getGuiStats().getInfoAreaGutterWidth() * 3) - model.getGuiStats().getScaledActionSize();
+            double textHeight = model.getGuiStats().getScaledActionSize() * 0.7;
+
+            if (useScrollbar) {
+                textWidth -= scrollArea;
+                descWidth -= scrollArea;
+            }
+
+            textWriter.drawScaledText(textx, texty, textWidth, textHeight, action.getDisplayName());
+
+            double descx = model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaGutterWidth();
+            double descy = model.getGuiStats().getInfoAreaY() + (model.getGuiStats().getInfoAreaGutterHeight() * 2) + (model.getGuiStats().getScaledActionSize() * 1.2);
+
+            if (useScrollbar) {
+                textWriter.drawScrollText(descx, descy, descWidth, descHeight, model.getScrollPos(), 1, action.getDescription(), TextWriter.LEADING);
+            } else {
+                textWriter.drawScaledText(descx, descy, descWidth, descHeight, action.getDescription(), TextWriter.LEADING, TextWriter.LEADING);
+            }
+
+            Minecraft.getMinecraft().getTextureManager().bindTexture(backgroundTex);
+            tessellator.startDrawingQuads();
+            GL11.glColor4f(1, 1, 1, 1);
+            double descriptionSplitX = model.getGuiStats().getInfoAreaX() + 3;
+            double descriptionSplitY = model.getGuiStats().getInfoAreaY() + (model.getGuiStats().getInfoAreaGutterHeight() * 1.5) + (model.getGuiStats().getScaledActionSize() * 1.2);
+
+            double separatorWidth = model.getGuiStats().getInfoAreaWidth() - 6;
+            if (useScrollbar) {
+                separatorWidth -= scrollArea;
+            }
+            drawImage(tessellator, descriptionSplitX, descriptionSplitY, separatorWidth, 1, 0, 31, 1, 32, 36, 32);
+
+            if (useScrollbar) {
+                scrollTrack.draw(tessellator, model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth() - scrollWidth, model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight(), this.zLevel, scrollWidth, model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight()));
+                scrollThumb.draw(tessellator, model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth() - scrollWidth, model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight() + (model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight())) * model.getScrollPos(), this.zLevel, scrollWidth, (model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight())) * 0.3);
+            }
+            tessellator.draw();
+
+            Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/atlas/abilities.png"));
+
+            tessellator.startDrawingQuads();
+            action = model.getCurrentAction();
             IIcon icon = action.getIcon();
 
             double x = model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaGutterWidth();
             double y = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
             drawImage(tessellator, x, y, model.getGuiStats().getScaledActionSize(), model.getGuiStats().getScaledActionSize(), icon.getMinU(), icon.getMinV(), icon.getMaxU(), icon.getMaxV(), 1, 1);
+            tessellator.draw();
         }
-        tessellator.draw();
     }
 
     @Override

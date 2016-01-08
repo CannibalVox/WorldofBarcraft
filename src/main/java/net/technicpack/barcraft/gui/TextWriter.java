@@ -4,6 +4,7 @@ import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Color;
 
+import javax.xml.soap.Text;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +52,86 @@ public class TextWriter {
         GL11.glPopMatrix();
     }
 
-    public void drawScaledText(double x, double y, double width, double height, String text, int hAlignment, int vAlignment) {
+    public class TextFitData {
+        private double scale;
+        private int lineCount;
+        private String[] lines;
+
+        public TextFitData(double scale, int lineCount, Object[] lines) {
+            this.scale = scale;
+            this.lineCount = lineCount;
+
+            this.lines = new String[lineCount];
+
+            for (int i = 0; i < lineCount; i++) {
+                this.lines[i] = lines[i].toString();
+            }
+        }
+
+        public double getScale() { return scale; }
+        public int getLineCount() { return lineCount; }
+        public String getLine(int index) { return lines[index]; }
+    }
+
+    public void drawScrollText(double x, double y, double width, double height, double scrollPos, double scale, String text, int hAlignment) {
+        TextFitData fitData = getScrollFit(width, scale, text);
+        double lineHeight = fontRenderer.FONT_HEIGHT * scale;
+        double textHeight = fitData.getLineCount() * lineHeight;
+        scrollPos = Math.min(Math.max(scrollPos, 0), 1);
+        double marginHeight = Math.max(textHeight - height, 0);
+        double offset = scrollPos * marginHeight * -1;
+
+        GL11.glPushMatrix();
+        double xTranslate = x;
+        double yTranslate = y - offset;
+        if (hAlignment == CENTER)
+            xTranslate += width / 2;
+        else if (hAlignment == TAILING)
+            xTranslate += width;
+        GL11.glTranslated(xTranslate, yTranslate, 0);
+        GL11.glScaled(fitData.getScale(), fitData.getScale(), fitData.getScale());
+        for (int i = 0; i < fitData.getLineCount(); i++) {
+            double lineY = y + offset + (i*lineHeight);
+            if (lineY < y || (lineY+lineHeight) >= (y+height))
+                continue;
+
+            int lineX = 0;
+            if (hAlignment == CENTER)
+                lineX = (int) -(double) this.fontRenderer.getStringWidth(fitData.getLine(i).toString()) / 2;
+            else if (hAlignment == TAILING)
+                lineX = (int) - (double) this.fontRenderer.getStringWidth(fitData.getLine(i).toString());
+
+            this.fontRenderer.drawString(fitData.getLine(i), lineX, 0, 4210752);
+            GL11.glTranslated(0, fontRenderer.FONT_HEIGHT, 0);
+        }
+        GL11.glPopMatrix();
+    }
+
+    public TextFitData getScrollFit(double width, double scale, String text) {
+        String[] tokens = text.split("((?<=\\s)|(?=\\s))");
+
+        List<String> lines = new ArrayList<String>();
+        String currentLine = "";
+        double currentWidth = 0;
+        for (int i = 0; i < tokens.length; i++) {
+            double tokenWidth = scale * fontRenderer.getStringWidth(tokens[i]);
+            if (currentWidth + tokenWidth < width) {
+                currentLine = currentLine.concat(tokens[i]);
+                currentWidth += tokenWidth;
+            } else {
+                lines.add(currentLine.trim());
+                currentLine = tokens[i].trim();
+                currentWidth = fontRenderer.getStringWidth(currentLine);
+            }
+        }
+
+        if (!currentLine.trim().equals(""))
+            lines.add(currentLine.trim());
+
+        return new TextFitData(scale, lines.size(), lines.toArray());
+    }
+
+    public TextFitData getFitForText(double width, double height, String text) {
         String[] tokens = text.split("((?<=\\s)|(?=\\s))");
 
         int largestToken = 0;
@@ -113,7 +193,13 @@ public class TextWriter {
             }
         }
 
-        double totalTextHeight = bestLines * this.fontRenderer.FONT_HEIGHT * bestScale;
+        return new TextFitData(bestScale, bestLines, bestText);
+    }
+
+    public void drawScaledText(double x, double y, double width, double height, String text, int hAlignment, int vAlignment) {
+        TextFitData fitData = getFitForText(width, height, text);
+
+        double totalTextHeight = fitData.getLineCount() * this.fontRenderer.FONT_HEIGHT * fitData.getScale();
 
         GL11.glPushMatrix();
         double xTranslate = x;
@@ -127,15 +213,15 @@ public class TextWriter {
         else if (vAlignment == TAILING)
             yTranslate += (height - totalTextHeight);
         GL11.glTranslated(xTranslate, yTranslate, 0);
-        GL11.glScaled(bestScale, bestScale, bestScale);
-        for (int i = 0; i < bestLines; i++) {
+        GL11.glScaled(fitData.getScale(), fitData.getScale(), fitData.getScale());
+        for (int i = 0; i < fitData.getLineCount(); i++) {
             int lineX = 0;
             if (hAlignment == CENTER)
-                lineX = (int) -(double) this.fontRenderer.getStringWidth(bestText[i].toString()) / 2;
+                lineX = (int) -(double) this.fontRenderer.getStringWidth(fitData.getLine(i).toString()) / 2;
             else if (hAlignment == TAILING)
-                lineX = (int) - (double) this.fontRenderer.getStringWidth(bestText[i].toString());
+                lineX = (int) - (double) this.fontRenderer.getStringWidth(fitData.getLine(i).toString());
 
-            this.fontRenderer.drawString(bestText[i].toString(), lineX, i * this.fontRenderer.FONT_HEIGHT, 4210752);
+            this.fontRenderer.drawString(fitData.getLine(i), lineX, i * this.fontRenderer.FONT_HEIGHT, 4210752);
         }
         GL11.glPopMatrix();
     }
