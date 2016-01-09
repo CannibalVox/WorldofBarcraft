@@ -279,8 +279,10 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
         for (int i = 0; i < model.getCurrentBar().getActionCount(); i++) {
             IAction action = model.getCurrentBar().getAction(i);
 
-            if (action == null)
+            if (action == null) {
+                actionX += model.getGuiStats().getActionBarSpacing();
                 continue;
+            }
 
             if (!WorldOfBarcraft.proxy.getApi().playerHasAction(Minecraft.getMinecraft().thePlayer, action))
                 tessellator.setColorOpaque(50, 50, 50);
