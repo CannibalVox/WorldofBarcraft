@@ -9,7 +9,7 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
     private Model model;
     private IGuiController controller;
 
-    private int lastDragX, lastDragY;
+    private int startDragX, startDragY;
     private Object draggedObject = null;
 
     public MVCGui(View view, Model model, IGuiController<Model, View> controller) {
@@ -70,8 +70,8 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
         if (mouseButton == 0 && this.draggedObject == null) {
             this.draggedObject = controller.findDraggableObject(mouseX, mouseY);
             if (this.draggedObject != null) {
-                lastDragX = mouseX;
-                lastDragY = mouseY;
+                startDragX = mouseX;
+                startDragY = mouseY;
             }
         }
     }
@@ -84,11 +84,10 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
     protected void mouseClickMove(int mouseX, int mouseY, int lastButton, long timeSinceClick) {
         super.mouseClickMove(mouseX, mouseY, lastButton, timeSinceClick);
         if (lastButton == 0 && this.draggedObject != null) {
-            this.draggedObject = controller.moveDraggedObject(this.draggedObject, lastDragX, lastDragY, mouseX, mouseY, timeSinceClick);
-            lastDragX = mouseX;
-            lastDragY = mouseY;
+            Object draggedObj = this.draggedObject;
+            this.draggedObject = controller.moveDraggedObject(this.draggedObject, startDragX, startDragY, mouseX, mouseY, timeSinceClick);
             if (this.draggedObject == null)
-                controller.releaseDraggedObject(this.draggedObject);
+                controller.releaseDraggedObject(draggedObj);
         }
     }
 

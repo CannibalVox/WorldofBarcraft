@@ -9,7 +9,6 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
 
     private ModelBarcraftConfig model;
     private ViewBarcraftConfig view;
-    private int startY = 0;
     private double startScrollPos = 0;
 
     @Override
@@ -121,12 +120,11 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
         model.setScrollPos(newPos);
     }
 
-    private void dragScroll(int mouseY) {
-        double deltaY = mouseY - startY;
+    private void dragScroll(int deltaY) {
         double trackPct = 1 - model.getScrollPct();
         double descHeight = model.getGuiStats().getInfoAreaHeight() - (model.getGuiStats().getInfoAreaGutterHeight() * 3) - (model.getGuiStats().getScaledActionSize() * 1.2);
 
-        double newScrollPos = startScrollPos + (deltaY / (descHeight * trackPct));
+        double newScrollPos = startScrollPos + (deltaY / (descHeight * trackPct*model.getGuiStats().getGuiScale()));
         newScrollPos = Math.max(0, Math.min(1, newScrollPos));
         model.setScrollPos(newScrollPos);
     }
@@ -141,7 +139,6 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
         scrollX -= scrollAreaWidth;
 
         if (mouseX >= scrollX && mouseX < scrollX + scrollAreaWidth && mouseY >= scrollY) {
-            startY = mouseY;
             startScrollPos = model.getScrollPos();
             return "scroll";
         }
@@ -150,9 +147,9 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
     }
 
     @Override
-    public Object moveDraggedObject(Object dragObj, int lastX, int lastY, int mouseX, int mouseY, long timeSinceClick) {
+    public Object moveDraggedObject(Object dragObj, int startX, int startY, int mouseX, int mouseY, long timeSinceClick) {
         if (dragObj.equals("scroll")) {
-            dragScroll(mouseY);
+            dragScroll(mouseY-startY);
             return dragObj;
         }
         return null;
