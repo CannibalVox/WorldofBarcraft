@@ -129,6 +129,16 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
         model.setScrollPos(newScrollPos);
     }
 
+    private class RemovalDragObj {
+        private int index;
+
+        public RemovalDragObj(int index) {
+            this.index = index;
+        }
+
+        public int getActionIndex() { return index; }
+    }
+
     @Override
     public Object findDraggableObject(int mouseX, int mouseY) {
 
@@ -143,6 +153,19 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
             return "scroll";
         }
 
+        double actionX = model.getGuiStats().getActionBarX() + (double) model.getCurrentBar().getRenderData().barGraphicInsets().getX() * model.getGuiStats().getActionBarScale();
+        double actionY = model.getGuiStats().getActionBarY() + (double) model.getCurrentBar().getRenderData().barGraphicInsets().getY() * model.getGuiStats().getActionBarScale();
+        double actionSize = (double) model.getCurrentBar().getRenderData().getActionWidth() * model.getGuiStats().getActionBarScale();
+
+        if (model.getCurrentBar() != null) {
+            for (int i = 0; i < model.getCurrentBar().getActionCount(); i++) {
+                if (mouseX >= actionX && mouseY >= actionY && mouseX < actionX + actionSize && mouseY < actionY + actionSize) {
+                    return new RemovalDragObj(i);
+                }
+                actionX += model.getGuiStats().getActionBarSpacing();
+            }
+        }
+
         return null;
     }
 
@@ -150,6 +173,14 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
     public Object moveDraggedObject(Object dragObj, int startX, int startY, int mouseX, int mouseY, long timeSinceClick) {
         if (dragObj.equals("scroll")) {
             dragScroll(mouseY-startY);
+            return dragObj;
+        } else if (dragObj instanceof RemovalDragObj) {
+            if (Math.abs(startX - mouseX) > 5 || Math.abs(startY - mouseY) > 5) {
+                if (model.getCurrentBar() != null) {
+                    model.getCurrentBar().setAction(((RemovalDragObj)dragObj).getActionIndex(), null);
+                }
+                return null;
+            }
             return dragObj;
         }
         return null;
