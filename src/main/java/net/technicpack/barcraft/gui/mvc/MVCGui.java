@@ -9,6 +9,9 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
     private Model model;
     private IGuiController controller;
 
+    private int lastDragX, lastDragY;
+    private Object draggedObject = null;
+
     public MVCGui(View view, Model model, IGuiController<Model, View> controller) {
         this.view = view;
         this.model = model;
@@ -64,5 +67,41 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
         if (controller.mouseClicked(mouseX, mouseY, mouseButton))
             return;
         super.mouseClicked(mouseX, mouseY, mouseButton);
+        if (mouseButton == 0 && this.draggedObject == null) {
+            this.draggedObject = controller.findDraggableObject(mouseX, mouseY);
+            if (this.draggedObject != null) {
+                lastDragX = mouseX;
+                lastDragY = mouseY;
+            }
+        }
+    }
+
+    /**
+     * Called when a mouse button is pressed and the mouse is moved around. Parameters are : mouseX, mouseY,
+     * lastButtonClicked & timeSinceMouseClick.
+     */
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int lastButton, long timeSinceClick) {
+        super.mouseClickMove(mouseX, mouseY, lastButton, timeSinceClick);
+        if (lastButton == 0 && this.draggedObject != null) {
+            this.draggedObject = controller.moveDraggedObject(this.draggedObject, lastDragX, lastDragY, mouseX, mouseY, timeSinceClick);
+            lastDragX = mouseX;
+            lastDragY = mouseY;
+            if (this.draggedObject == null)
+                controller.releaseDraggedObject(this.draggedObject);
+        }
+    }
+
+    /**
+     * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
+     * mouseMove, which==0 or which==1 is mouseUp
+     */
+    protected void mouseReleased(int mouseX, int mouseY, int mouseButton) {
+        super.mouseReleased(mouseX, mouseY, mouseButton);
+
+        if (mouseButton == 0 && this.draggedObject != null) {
+            controller.releaseDraggedObject(this.draggedObject);
+            this.draggedObject = null;
+        }
     }
 }

@@ -9,6 +9,8 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
 
     private ModelBarcraftConfig model;
     private ViewBarcraftConfig view;
+    private int startY = 0;
+    private double startScrollPos = 0;
 
     @Override
     public void setData(ModelBarcraftConfig model, ViewBarcraftConfig view) {
@@ -117,5 +119,47 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
         double thumbAsTrackPct = model.getScrollPct() / trackPct;
         double newPos = Math.min(1, model.getScrollPos() + thumbAsTrackPct);
         model.setScrollPos(newPos);
+    }
+
+    private void dragScroll(int mouseY) {
+        double deltaY = mouseY - startY;
+        double trackPct = 1 - model.getScrollPct();
+        double descHeight = model.getGuiStats().getInfoAreaHeight() - (model.getGuiStats().getInfoAreaGutterHeight() * 3) - (model.getGuiStats().getScaledActionSize() * 1.2);
+
+        double newScrollPos = startScrollPos + (deltaY / (descHeight * trackPct));
+        newScrollPos = Math.max(0, Math.min(1, newScrollPos));
+        model.setScrollPos(newScrollPos);
+    }
+
+    @Override
+    public Object findDraggableObject(int mouseX, int mouseY) {
+
+        double scrollY = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
+
+        double scrollAreaWidth = 4 * model.getGuiStats().getGuiScale();
+        double scrollX = model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth();
+        scrollX -= scrollAreaWidth;
+
+        if (mouseX >= scrollX && mouseX < scrollX + scrollAreaWidth && mouseY >= scrollY) {
+            startY = mouseY;
+            startScrollPos = model.getScrollPos();
+            return "scroll";
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object moveDraggedObject(Object dragObj, int lastX, int lastY, int mouseX, int mouseY, long timeSinceClick) {
+        if (dragObj.equals("scroll")) {
+            dragScroll(mouseY);
+            return dragObj;
+        }
+        return null;
+    }
+
+    @Override
+    public void releaseDraggedObject(Object dragObj) {
+
     }
 }
