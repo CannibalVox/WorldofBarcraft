@@ -76,10 +76,46 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
             int y = (int)(model.getGuiStats().getAbilityAreaY() + model.getGuiStats().getActionAreaGutterHeight() + (model.getGuiStats().getScaledActionSlotSize() * actionRow));
             if (mouseX >= x && mouseY >= y && mouseX < x+model.getGuiStats().getScaledActionSlotSize() && mouseY < y+model.getGuiStats().getScaledActionSlotSize()) {
                 model.selectAbility(i+model.getPageIndex());
+                view.refreshScrollbar();
+                return true;
+            }
+        }
+
+        double scrollWidth = 4 * model.getGuiStats().getGuiScale();
+        double scrollX = model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth() - scrollWidth;
+        double scrollTrackY = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
+        double scrollTrackHeight = model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight());
+
+        double trackPct = 1 - model.getScrollPct();
+        double scrollThumbY = scrollTrackY + (scrollTrackHeight * trackPct * model.getScrollPos());
+        double scrollThumbHeight = scrollTrackHeight * model.getScrollPct();
+
+        if (mouseX >= scrollX && mouseX < scrollX + scrollWidth) {
+            if (mouseY >= scrollTrackY && mouseY < scrollThumbY) {
+                punchScrollUp();
+                return true;
+            }
+
+            if (mouseY >= (scrollThumbY + scrollThumbHeight) && mouseY < (scrollTrackY + scrollTrackHeight)) {
+                punchScrollDown();
                 return true;
             }
         }
 
         return false;
+    }
+
+    private void punchScrollUp() {
+        double trackPct = 1 - model.getScrollPct();
+        double thumbAsTrackPct = model.getScrollPct() / trackPct;
+        double newPos = Math.max(0, model.getScrollPos() - thumbAsTrackPct);
+        model.setScrollPos(newPos);
+    }
+
+    private void punchScrollDown() {
+        double trackPct = 1 - model.getScrollPct();
+        double thumbAsTrackPct = model.getScrollPct() / trackPct;
+        double newPos = Math.min(1, model.getScrollPos() + thumbAsTrackPct);
+        model.setScrollPos(newPos);
     }
 }

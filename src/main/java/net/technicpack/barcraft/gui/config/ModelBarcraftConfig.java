@@ -22,6 +22,7 @@ public class ModelBarcraftConfig implements IGuiModel, Iterable<IActionContainer
     private List<IAction> actionsForBar = new ArrayList<IAction>();
     private BarcraftGuiStats barcraftGuiStats = null;
     private double scrollPos = 0;
+    private double scrollPct = 0;
 
     public ModelBarcraftConfig() {
         containerRegistry = WorldOfBarcraft.proxy.getApi().getActionContainerRegistry();
@@ -76,6 +77,9 @@ public class ModelBarcraftConfig implements IGuiModel, Iterable<IActionContainer
     public IAction getAction(int index) { return actionsForBar.get(index); }
     public BarcraftGuiStats getGuiStats() { return this.barcraftGuiStats; }
     public double getScrollPos() { return scrollPos; }
+    public double getScrollPct() { return scrollPct; }
+    public void setScrollPos(double pos) { scrollPos = pos; }
+    public void setScrollPct(double pct) { scrollPct = pct; }
 
     public void selectNextBar() {
         Iterator<IActionContainer> iterator = this.iterator();

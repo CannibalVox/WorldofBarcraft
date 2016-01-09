@@ -87,6 +87,30 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             this.actionsPageRight.visible = false;
     }
 
+    public void refreshScrollbar() {
+        if (model.getCurrentAction() == null)
+            return;
+
+        double descWidth = model.getGuiStats().getInfoAreaWidth() - (model.getGuiStats().getInfoAreaGutterWidth() * 2);
+        double descHeight = model.getGuiStats().getInfoAreaHeight() - (model.getGuiStats().getInfoAreaGutterHeight() * 3) - (model.getGuiStats().getScaledActionSize() * 1.2);
+        TextWriter.TextFitData textFitData = textWriter.getFitForText(descWidth, descHeight, model.getCurrentAction().getDescription());
+
+        boolean useScrollbar = textFitData.getScale() <= 1.0;
+
+        if (!useScrollbar)
+            return;
+
+        double scrollWidth = model.getGuiStats().getGuiScale() * 4;
+        double scrollArea = model.getGuiStats().getInfoAreaGutterWidth() + scrollWidth;
+
+        descWidth -= scrollArea;
+
+        TextWriter.TextFitData data = textWriter.getScrollFit(descWidth, 1, model.getCurrentAction().getDescription());
+        double textHeight = (double)(data.getLineCount() * textWriter.getStringHeight());
+        model.setScrollPos(0);
+        model.setScrollPct(descHeight / textHeight);
+    }
+
     private void updateGuiStats() {
         if (actionsPageLeft != null)
             this.buttonList.remove(actionsPageLeft);
@@ -311,7 +335,7 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             double descy = model.getGuiStats().getInfoAreaY() + (model.getGuiStats().getInfoAreaGutterHeight() * 2) + (model.getGuiStats().getScaledActionSize() * 1.2);
 
             if (useScrollbar) {
-                textWriter.drawScrollText(descx, descy, descWidth, descHeight, model.getScrollPos(), 1, action.getDescription(), TextWriter.LEADING);
+                textWriter.drawScrollText(descx, descy, descWidth, descHeight, model.getScrollPos(), 1, model.getGuiStats().getGuiScale(), action.getDescription(), TextWriter.LEADING);
             } else {
                 textWriter.drawScaledText(descx, descy, descWidth, descHeight, action.getDescription(), TextWriter.LEADING, TextWriter.LEADING);
             }
@@ -329,8 +353,16 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
             drawImage(tessellator, descriptionSplitX, descriptionSplitY, separatorWidth, 1, 0, 31, 1, 32, 36, 32);
 
             if (useScrollbar) {
-                scrollTrack.draw(tessellator, model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth() - scrollWidth, model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight(), this.zLevel, scrollWidth, model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight()));
-                scrollThumb.draw(tessellator, model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth() - scrollWidth, model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight() + (model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight())) * model.getScrollPos(), this.zLevel, scrollWidth, (model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight())) * 0.3);
+                double scrollTrackY = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
+                double scrollTrackHeight = model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight());
+
+                scrollTrack.draw(tessellator, model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth() - scrollWidth, scrollTrackY, this.zLevel, scrollWidth, scrollTrackHeight);
+
+                double scrollPct = model.getScrollPct();
+                double scrollThumbHeight = scrollPct * scrollTrackHeight;
+                double scrollThumbY = scrollTrackY + ((scrollTrackHeight - scrollThumbHeight) * model.getScrollPos());
+
+                scrollThumb.draw(tessellator, model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth() - scrollWidth,  scrollThumbY, this.zLevel, scrollWidth, scrollThumbHeight);
             }
             tessellator.draw();
 

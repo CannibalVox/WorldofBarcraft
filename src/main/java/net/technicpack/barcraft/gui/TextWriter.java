@@ -73,9 +73,9 @@ public class TextWriter {
         public String getLine(int index) { return lines[index]; }
     }
 
-    public void drawScrollText(double x, double y, double width, double height, double scrollPos, double scale, String text, int hAlignment) {
+    public void drawScrollText(double x, double y, double width, double height, double scrollPos, double scale, double guiScale, String text, int hAlignment) {
         TextFitData fitData = getScrollFit(width, scale, text);
-        double lineHeight = fontRenderer.FONT_HEIGHT * scale;
+        double lineHeight = fontRenderer.FONT_HEIGHT;
         double textHeight = fitData.getLineCount() * lineHeight;
         scrollPos = Math.min(Math.max(scrollPos, 0), 1);
         double marginHeight = Math.max(textHeight - height, 0);
@@ -83,7 +83,7 @@ public class TextWriter {
 
         GL11.glPushMatrix();
         double xTranslate = x;
-        double yTranslate = y - offset;
+        double yTranslate = y + offset;
         if (hAlignment == CENTER)
             xTranslate += width / 2;
         else if (hAlignment == TAILING)
@@ -92,17 +92,19 @@ public class TextWriter {
         GL11.glScaled(fitData.getScale(), fitData.getScale(), fitData.getScale());
         for (int i = 0; i < fitData.getLineCount(); i++) {
             double lineY = y + offset + (i*lineHeight);
-            if (lineY < y || (lineY+lineHeight) >= (y+height))
+            if (lineY < y || (lineY+lineHeight) > (y+height)) {
+                GL11.glTranslated(0, lineHeight, 0);
                 continue;
+            }
 
             int lineX = 0;
             if (hAlignment == CENTER)
-                lineX = (int) -(double) this.fontRenderer.getStringWidth(fitData.getLine(i).toString()) / 2;
+                lineX = (int) -(double) this.fontRenderer.getStringWidth(fitData.getLine(i)) / 2;
             else if (hAlignment == TAILING)
-                lineX = (int) - (double) this.fontRenderer.getStringWidth(fitData.getLine(i).toString());
+                lineX = (int) - (double) this.fontRenderer.getStringWidth(fitData.getLine(i));
 
             this.fontRenderer.drawString(fitData.getLine(i), lineX, 0, 4210752);
-            GL11.glTranslated(0, fontRenderer.FONT_HEIGHT, 0);
+            GL11.glTranslated(0, lineHeight, 0);
         }
         GL11.glPopMatrix();
     }
