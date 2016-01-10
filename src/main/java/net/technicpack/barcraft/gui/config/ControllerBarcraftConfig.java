@@ -142,12 +142,16 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
     public Object findDraggableObject(int mouseX, int mouseY) {
 
         double scrollY = model.getGuiStats().getInfoAreaY() + model.getGuiStats().getInfoAreaGutterHeight();
+        double scrollHeight = model.getGuiStats().getInfoAreaHeight() - (2 * model.getGuiStats().getInfoAreaGutterHeight());
+        double thumbHeight = scrollHeight * model.getScrollPct();
+        double trackPct = 1 - model.getScrollPct();
+        double thumbY = scrollY + (scrollHeight * trackPct * model.getScrollPos());
 
         double scrollAreaWidth = 4 * model.getGuiStats().getGuiScale();
         double scrollX = model.getGuiStats().getInfoAreaX() + model.getGuiStats().getInfoAreaWidth() - model.getGuiStats().getInfoAreaGutterWidth();
         scrollX -= scrollAreaWidth;
 
-        if (mouseX >= scrollX && mouseX < scrollX + scrollAreaWidth && mouseY >= scrollY) {
+        if (mouseX >= scrollX && mouseX < scrollX + scrollAreaWidth && mouseY >= thumbY && mouseY < (thumbY + thumbHeight)) {
             startScrollPos = model.getScrollPos();
             return "scroll";
         }
