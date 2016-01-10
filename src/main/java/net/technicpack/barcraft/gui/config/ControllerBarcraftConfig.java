@@ -2,6 +2,7 @@ package net.technicpack.barcraft.gui.config;
 
 import net.minecraft.client.Minecraft;
 import net.technicpack.barcraft.WorldOfBarcraft;
+import net.technicpack.barcraft.api.IAction;
 import net.technicpack.barcraft.gui.BarcraftGuiStats;
 import net.technicpack.barcraft.gui.mvc.IGuiController;
 
@@ -47,9 +48,9 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
     }
 
     @Override
-    public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (model.getCurrentBar() == null)
-            return false;
+            return;
 
         double lockX = model.getGuiStats().getActionLockX();
         double lockY = model.getGuiStats().getActionLockY();
@@ -59,7 +60,7 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
 
                 if (!model.getCurrentBar().isLocked(i) && model.getCurrentBar().getAction(i) != null && !WorldOfBarcraft.proxy.getApi().playerHasAction(Minecraft.getMinecraft().thePlayer, model.getCurrentBar().getAction(i)))
                     model.getCurrentBar().setAction(i, null);
-                return true;
+                return;
             }
             if (model.getCurrentBar().getRenderData().isBarHorizontalOnScreen())
                 lockX += model.getGuiStats().getActionBarSpacing();
@@ -78,7 +79,7 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
             if (mouseX >= x && mouseY >= y && mouseX < x+model.getGuiStats().getScaledActionSlotSize() && mouseY < y+model.getGuiStats().getScaledActionSlotSize()) {
                 model.selectAbility(i+model.getPageIndex());
                 view.refreshScrollbar();
-                return true;
+                return;
             }
         }
 
@@ -94,16 +95,14 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
         if (mouseX >= scrollX && mouseX < scrollX + scrollWidth) {
             if (mouseY >= scrollTrackY && mouseY < scrollThumbY) {
                 punchScrollUp();
-                return true;
+                return;
             }
 
             if (mouseY >= (scrollThumbY + scrollThumbHeight) && mouseY < (scrollTrackY + scrollTrackHeight)) {
                 punchScrollDown();
-                return true;
+                return;
             }
         }
-
-        return false;
     }
 
     private void punchScrollUp() {
@@ -166,6 +165,19 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
             }
         }
 
+        int abilityIndex = (model.getPageIndex() / model.getGuiStats().getActionCount()) * model.getGuiStats().getActionCount();
+        for (int i = 0; i < model.getGuiStats().getActionCount(); i++) {
+            if (i + abilityIndex >= model.getActionForBarCount())
+                break;
+            int abilityRow = i / model.getGuiStats().getActionCountX();
+            int abilityColumn = i % model.getGuiStats().getActionCountX();
+            double abilityIconX = model.getGuiStats().getAbilityAreaX() + abilityColumn * model.getGuiStats().getScaledActionSlotSize() + model.getGuiStats().getActionAreaGutterWidth() + model.getGuiStats().getScaledActionLeftGutter();
+            double abilityIconY = model.getGuiStats().getAbilityAreaY() + abilityRow * model.getGuiStats().getScaledActionSlotSize() + model.getGuiStats().getActionAreaGutterHeight() + model.getGuiStats().getScaledActionTopGutter();
+            if (mouseX >= abilityIconX && mouseY >= abilityIconY && mouseX < abilityIconX + model.getGuiStats().getScaledActionSize() && mouseY < abilityIconY + model.getGuiStats().getScaledActionSize()) {
+                return model.getAction(i + abilityIndex);
+            }
+        }
+
         return null;
     }
 
@@ -173,7 +185,6 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
     public Object moveDraggedObject(Object dragObj, int startX, int startY, int mouseX, int mouseY, long timeSinceClick) {
         if (dragObj.equals("scroll")) {
             dragScroll(mouseY-startY);
-            return dragObj;
         } else if (dragObj instanceof RemovalDragObj) {
             if (Math.abs(startX - mouseX) > 5 || Math.abs(startY - mouseY) > 5) {
                 if (model.getCurrentBar() != null) {
@@ -181,13 +192,26 @@ public class ControllerBarcraftConfig implements IGuiController<ModelBarcraftCon
                 }
                 return null;
             }
-            return dragObj;
         }
-        return null;
+        return dragObj;
     }
 
     @Override
-    public void releaseDraggedObject(Object dragObj) {
+    public void releaseDraggedObject(Object dragObj, int startX, int startY, int mouseX, int mouseY) {
+        if (dragObj instanceof IAction && model.getCurrentBar() != null) {
+            double actionX = model.getGuiStats().getActionBarX() + (double) model.getCurrentBar().getRenderData().barGraphicInsets().getX() * model.getGuiStats().getActionBarScale();
+            double actionY = model.getGuiStats().getActionBarY() + (double) model.getCurrentBar().getRenderData().barGraphicInsets().getY() * model.getGuiStats().getActionBarScale();
+            double actionSize = (double) model.getCurrentBar().getRenderData().getActionWidth() * model.getGuiStats().getActionBarScale();
 
+            if (model.getCurrentBar() != null) {
+                for (int i = 0; i < model.getCurrentBar().getActionCount(); i++) {
+                    if (mouseX >= actionX && mouseY >= actionY && mouseX < actionX + actionSize && mouseY < actionY + actionSize) {
+                        model.getCurrentBar().setAction(i, (IAction)dragObj);
+                        return;
+                    }
+                    actionX += model.getGuiStats().getActionBarSpacing();
+                }
+            }
+        }
     }
 }

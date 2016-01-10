@@ -64,15 +64,11 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
      */
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (controller.mouseClicked(mouseX, mouseY, mouseButton))
-            return;
+        controller.mouseClicked(mouseX, mouseY, mouseButton);
         super.mouseClicked(mouseX, mouseY, mouseButton);
         if (mouseButton == 0 && this.draggedObject == null) {
-            this.draggedObject = controller.findDraggableObject(mouseX, mouseY);
-            if (this.draggedObject != null) {
-                startDragX = mouseX;
-                startDragY = mouseY;
-            }
+            startDragX = mouseX;
+            startDragY = mouseY;
         }
     }
 
@@ -87,7 +83,9 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
             Object draggedObj = this.draggedObject;
             this.draggedObject = controller.moveDraggedObject(this.draggedObject, startDragX, startDragY, mouseX, mouseY, timeSinceClick);
             if (this.draggedObject == null)
-                controller.releaseDraggedObject(draggedObj);
+                controller.releaseDraggedObject(draggedObj, startDragX, startDragY, mouseX, mouseY);
+        } else if (lastButton == 0 && (Math.abs(mouseX - startDragX) > 3 || Math.abs(mouseY - startDragY) > 3)) {
+            this.draggedObject = controller.findDraggableObject(startDragX, startDragY);
         }
     }
 
@@ -99,7 +97,7 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
         super.mouseReleased(mouseX, mouseY, mouseButton);
 
         if (mouseButton == 0 && this.draggedObject != null) {
-            controller.releaseDraggedObject(this.draggedObject);
+            controller.releaseDraggedObject(this.draggedObject, startDragX, startDragY, mouseX, mouseY);
             this.draggedObject = null;
         }
     }

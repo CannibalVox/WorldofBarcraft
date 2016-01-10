@@ -4,9 +4,9 @@ public interface IGuiController<Model extends IGuiModel, View extends IGuiView<M
     void setData(Model model, View view);
     void initController();
     void triggerAction(int id);
-    boolean mouseClicked(int mouseX, int mouseY, int mouseButton);
+    void mouseClicked(int mouseX, int mouseY, int mouseButton);
 
     Object findDraggableObject(int mouseX, int mouseY);
     Object moveDraggedObject(Object dragObj, int startX, int startY, int mouseX, int mouseY, long timeSinceClick);
-    void releaseDraggedObject(Object dragObj);
+    void releaseDraggedObject(Object dragObj, int startX, int startY, int mouseX, int mouseY);
 }
