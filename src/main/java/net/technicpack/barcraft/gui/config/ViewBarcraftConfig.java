@@ -383,17 +383,24 @@ public class ViewBarcraftConfig implements IGuiView<ModelBarcraftConfig> {
 
     @Override
     public void postDrawForeground(int mouseX, int mouseY, float partialTicks) {
-        GL11.glEnable(GL11.GL_LIGHTING);
-
-//        if (this.draggedAction != null) {
-//
-//        }
-
         GL11.glPopMatrix();
-
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         RenderHelper.enableStandardItemLighting();
+    }
+
+    @Override
+    public void drawDraggedObject(Object draggedObj, int mouseX, int mouseY) {
+        GL11.glDisable(GL11.GL_LIGHTING);
+
+        if (draggedObj instanceof IAction) {
+            IAction action = (IAction)draggedObj;
+            IIcon icon = action.getIcon();
+            Tessellator tessellator = Tessellator.instance;
+            tessellator.startDrawingQuads();
+            drawImage(tessellator, mouseX, mouseY, model.getGuiStats().getScaledActionSize(), model.getGuiStats().getScaledActionSize(), icon.getMinU(), icon.getMinV(), icon.getMaxU(), icon.getMaxV(), 1, 1);
+            tessellator.draw();
+        }
     }
 
     //Draw GUI art without forcing a 256x256 art size

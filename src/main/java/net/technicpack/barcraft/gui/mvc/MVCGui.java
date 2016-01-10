@@ -50,6 +50,10 @@ public class MVCGui<Model extends IGuiModel, View extends IGuiView<Model>> exten
         view.preDrawForeground(mouseX, mouseY, partialTicks);
         this.zLevel = -100;
         view.drawForeground(mouseX, mouseY, partialTicks);
+
+        if (draggedObject != null)
+            view.drawDraggedObject(draggedObject, mouseX, mouseY);
+
         view.postDrawForeground(mouseX, mouseY, partialTicks);
     }
 

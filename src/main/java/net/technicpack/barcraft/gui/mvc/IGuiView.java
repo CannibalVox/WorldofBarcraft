@@ -17,4 +17,6 @@ public interface IGuiView<Model extends IGuiModel> {
     void preDrawForeground(int mouseX, int mouseY, float partialTicks);
     void drawForeground(int mouseX, int mouseY, float partialTicks);
     void postDrawForeground(int mouseX, int mouseY, float partialTicks);
+
+    void drawDraggedObject(Object draggedObj, int mouseX, int mouseY);
 }
